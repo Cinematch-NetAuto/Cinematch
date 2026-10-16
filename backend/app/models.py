@@ -5,7 +5,7 @@ same names. schema.sql creates the tables; these classes only describe them,
 so a change to a table means editing both files. Models hold no logic.
 Hot file: tell the team before you edit it.
 
-Users, ratings, history and preferences are added in later steps.
+Ratings, watch history and preferences are added in the next step.
 """
 
 from datetime import date, datetime
@@ -16,6 +16,19 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 class Base(DeclarativeBase):
     """The parent of every model."""
+
+
+class User(Base):
+    """A person with an account. Only a bcrypt hash of the password is kept."""
+
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(primary_key=True)  # SERIAL: the database numbers users
+    email: Mapped[str] = mapped_column(Text, unique=True)  # always stored lowercased
+    password_hash: Mapped[str] = mapped_column(Text)  # bcrypt output, never the password
+    display_name: Mapped[str] = mapped_column(Text)
+    content_language: Mapped[str] = mapped_column(Text, server_default="en-US")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
 class Genre(Base):
