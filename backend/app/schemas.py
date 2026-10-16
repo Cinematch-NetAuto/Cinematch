@@ -4,7 +4,19 @@ FastAPI checks every request and response against these, and shows them on
 the /docs page. Hot file: tell the team before you edit it.
 """
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+EMAIL_PATTERN = r"^[^@\s]+@[^@\s]+\.[^@\s]+$"  # something@something.something
+
+
+def _clean_email(value: object) -> object:
+    """Trim spaces and lowercase, so "Sam@Example.com " and "sam@example.com" match."""
+    return value.strip().lower() if isinstance(value, str) else value
+
+
+def _strip(value: object) -> object:
+    """Trim spaces, so "  " does not count as a name."""
+    return value.strip() if isinstance(value, str) else value
 
 
 class HealthOut(BaseModel):
@@ -60,3 +72,51 @@ class MoviePage(BaseModel):
     total_results: int
     total_pages: int
     results: list[MovieCard]
+
+
+class UserCreate(BaseModel):
+    """Sign-up form. At least 3 starter genres, so recommendations work from day one."""
+
+    email: str = Field(max_length=254, pattern=EMAIL_PATTERN)
+    password: str = Field(min_length=8, max_length=72)
+    display_name: str = Field(min_length=1, max_length=50)
+    genre_ids: list[int] = Field(description="At least 3 different genre ids, e.g. [28, 878, 18]")
+
+    _email = field_validator("email", mode="before")(_clean_email)
+    _name = field_validator("display_name", mode="before")(_strip)
+
+    @field_validator("genre_ids")
+    @classmethod
+    def at_least_three_genres(cls, genre_ids: list[int]) -> list[int]:
+        """Keep each genre once, and insist on 3 or more different ones."""
+        unique = sorted(set(genre_ids))
+        if len(unique) < 3:
+            raise ValueError("pick at least 3 different genres")
+        return unique
+
+
+class LoginRequest(BaseModel):
+    """Login form."""
+
+    email: str
+    password: str
+
+    _email = field_validator("email", mode="before")(_clean_email)
+
+
+class TokenResponse(BaseModel):
+    """Answer of a successful login: the token to send as "Authorization: Bearer ..."."""
+
+    access_token: str
+    token_type: str = "bearer"
+
+
+class UserOut(BaseModel):
+    """A user as the API shows them. Never includes the password hash."""
+
+    model_config = ConfigDict(from_attributes=True)  # can be built from a User row
+
+    id: int
+    email: str
+    display_name: str
+    content_language: str
