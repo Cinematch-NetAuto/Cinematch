@@ -149,7 +149,7 @@ each on their own branch. **After this phase `pytest -q` passes**, so the
 | [ ] | 14 | `feat: add Genre, Movie, MovieGenre and TmdbCache models` | `backend/app/models.py` | Imports clean. Every column name matches `schema.sql`. **Hot file — announce it** |
 | [ ] | 15 | `feat: add get_or_fetch() TMDB cache` | `backend/app/services/movies.py` | The same search twice → the log shows only **one** TMDB call |
 | [ ] | 16 | `feat: add genres and title search endpoints` | `backend/app/routers/movies.py` `backend/app/schemas.py` `backend/app/main.py` | `GET /api/genres` and `GET /api/movies/search` work in `/docs`. 10 and 20 per page both correct |
-| [ ] | 17 | `feat: add discover and movie detail endpoints` | `backend/app/routers/movies.py` `backend/app/services/movies.py` | Every filter (genres, years, sort, region, minimum rating) works in `/docs`. Detail returns cast and saves the film in `movies` |
+| [ ] | 17 | `feat: add discover and movie detail endpoints` | `backend/app/routers/movies.py` `backend/app/services/movies.py` `backend/app/schemas.py` `backend/app/tmdb.py` | Every filter (genres, years, sort, region, minimum rating) works in `/docs`. Detail returns cast and saves the film in `movies` |
 
 > **Traps**
 > - `tmdb.py` is the only file that imports `requests`. Every call has a timeout.
@@ -157,6 +157,10 @@ each on their own branch. **After this phase `pytest -q` passes**, so the
 > - "Top rated" needs `vote_count.gte=200`, or films with one vote win.
 > - When TMDB cannot be reached, `get_or_fetch` should return the old saved copy
 >   instead of failing. The offline demo (step 53) depends on this.
+> - Declare `/movies/discover` **before** `/movies/{tmdb_id}`, or "discover" is read
+>   as a film id. An unknown film must answer 404 (`TmdbNotFound`), not 502.
+> - Use `Annotated[...]` for `Depends`/`Query` parameters: ruff's B008 rejects
+>   `= Depends(...)` defaults, and Jenkins runs ruff.
 
 ---
 

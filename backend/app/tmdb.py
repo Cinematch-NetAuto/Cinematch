@@ -27,6 +27,10 @@ class TmdbError(Exception):
     """TMDB could not be reached, or refused the request."""
 
 
+class TmdbNotFound(TmdbError):
+    """TMDB has nothing under that id (404)."""
+
+
 def _get(path: str, params: dict | None = None) -> dict:
     """GET one TMDB endpoint and return its JSON, retrying short hiccups."""
     if not TMDB_API_TOKEN:
@@ -45,6 +49,8 @@ def _get(path: str, params: dict | None = None) -> dict:
             if response.status_code < 400:
                 return response.json()
             problem = f"TMDB answered {response.status_code}"
+            if response.status_code == 404:
+                raise TmdbNotFound(problem)
             if response.status_code not in RETRY_STATUSES:
                 raise TmdbError(problem)  # e.g. 401 bad token: retrying will not help
         if attempt < ATTEMPTS:
