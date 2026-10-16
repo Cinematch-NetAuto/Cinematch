@@ -4,6 +4,9 @@ FastAPI checks every request and response against these, and shows them on
 the /docs page. Hot file: tell the team before you edit it.
 """
 
+from datetime import datetime
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 EMAIL_PATTERN = r"^[^@\s]+@[^@\s]+\.[^@\s]+$"  # something@something.something
@@ -120,3 +123,29 @@ class UserOut(BaseModel):
     email: str
     display_name: str
     content_language: str
+
+
+class RatingIn(BaseModel):
+    """Like (+1) or dislike (-1) one film."""
+
+    tmdb_id: int = Field(gt=0)
+    value: Literal[1, -1]
+
+
+class RatedMovie(MovieCard):
+    """A film card plus the user's rating and when it was given."""
+
+    value: int  # +1 like, -1 dislike
+    rated_at: datetime
+
+
+class HistoryIn(BaseModel):
+    """Mark one film as watched."""
+
+    tmdb_id: int = Field(gt=0)
+
+
+class WatchedMovie(MovieCard):
+    """A film card plus when the user watched it."""
+
+    watched_at: datetime
