@@ -1,8 +1,25 @@
-"""Tests for password hashing."""
+"""Tests for password hashing and login tokens."""
 
+import jwt
 import pytest
 
-from app.security import MAX_PASSWORD_BYTES, hash_password, verify_password
+from app import security
+from app.security import (
+    MAX_PASSWORD_BYTES,
+    InvalidToken,
+    create_token,
+    hash_password,
+    read_token,
+    verify_password,
+)
+
+TEST_SECRET = "test-secret-for-the-token-tests-only-" + "x" * 16
+
+
+@pytest.fixture
+def secret(monkeypatch):
+    """Give the token functions a long test secret (no .env needed)."""
+    monkeypatch.setattr(security, "JWT_SECRET", TEST_SECRET)
 
 
 def test_right_password_passes():
@@ -46,3 +63,67 @@ def test_overlong_password_never_verifies():
     stored = hash_password("a" * MAX_PASSWORD_BYTES)
     # Without the length check, bcrypt would ignore the extra "b" and say yes.
     assert not verify_password("a" * MAX_PASSWORD_BYTES + "b", stored)
+
+
+# --- Login tokens ------------------------------------------------------------
+
+
+@pytest.mark.usefixtures("secret")
+def test_token_gives_back_the_user_id():
+    assert read_token(create_token(42)) == 42
+
+
+@pytest.mark.usefixtures("secret")
+def test_changed_user_id_fails():
+    # Anyone can read the payload, so swap user 1 for user 2 but keep the old signature.
+    header, _, signature = create_token(1).split(".")
+    claims = jwt.decode(create_token(1), options={"verify_signature": False})
+    forged_payload = jwt.encode({**claims, "sub": "2"}, "any-other-key-" + "y" * 32).split(".")[1]
+    with pytest.raises(InvalidToken):
+        read_token(f"{header}.{forged_payload}.{signature}")
+
+
+@pytest.mark.usefixtures("secret")
+def test_token_signed_with_another_secret_fails():
+    forged = jwt.encode({"sub": "1", "exp": 4102444800}, "a-different-secret-" + "z" * 32)
+    with pytest.raises(InvalidToken):
+        read_token(forged)
+
+
+@pytest.mark.usefixtures("secret")
+def test_expired_token_fails(monkeypatch):
+    monkeypatch.setattr(security, "TOKEN_HOURS", -1)  # made already one hour out of date
+    token = create_token(1)
+    with pytest.raises(InvalidToken):
+        read_token(token)
+
+
+@pytest.mark.usefixtures("secret")
+def test_unsigned_token_fails():
+    # alg "none" means "no signature needed"; only HS256 is accepted.
+    unsigned = jwt.encode({"sub": "1", "exp": 4102444800}, "", algorithm="none")
+    with pytest.raises(InvalidToken):
+        read_token(unsigned)
+
+
+@pytest.mark.usefixtures("secret")
+@pytest.mark.parametrize("token", ["", "not-a-token", "a.b.c"])
+def test_garbage_fails(token):
+    with pytest.raises(InvalidToken):
+        read_token(token)
+
+
+@pytest.mark.usefixtures("secret")
+def test_token_without_expiry_fails():
+    forever = jwt.encode({"sub": "1"}, TEST_SECRET, algorithm="HS256")
+    with pytest.raises(InvalidToken):
+        read_token(forever)
+
+
+@pytest.mark.parametrize("bad_secret", ["", "too-short"])
+def test_empty_or_short_secret_is_refused(monkeypatch, bad_secret):
+    monkeypatch.setattr(security, "JWT_SECRET", bad_secret)
+    with pytest.raises(RuntimeError):
+        create_token(1)
+    with pytest.raises(RuntimeError):
+        read_token("anything")
