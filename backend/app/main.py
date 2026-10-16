@@ -13,7 +13,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import CORS_ORIGINS
-from app.routers import auth, library, movies
+from app.routers import auth, library, movies, recommend
 from app.schemas import HealthOut
 
 # Show our own INFO lines ("TMDB GET ...", "cache hit ...") in the server log.
@@ -34,6 +34,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(library.router)
 app.include_router(movies.router)
+app.include_router(recommend.router)
 
 
 @app.get("/health", response_model=HealthOut, tags=["health"])

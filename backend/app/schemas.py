@@ -149,3 +149,10 @@ class WatchedMovie(MovieCard):
     """A film card plus when the user watched it."""
 
     watched_at: datetime
+
+
+class Recommendation(MovieCard):
+    """A film card plus why it was picked."""
+
+    score: float  # 0.0 to 1.0: 0.7 x genre fit + 0.3 x fair rating
+    reason: str  # e.g. "Because you liked Inception"
