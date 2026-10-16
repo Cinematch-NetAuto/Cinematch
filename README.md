@@ -20,16 +20,20 @@ then pick a task from [docs/build-plan.md](docs/build-plan.md).
 
 ---
 
-## Current status — 12 October 2026
+## Current status — 16 October 2026
 
-The repository is a **skeleton**. Every file the app needs already exists, but the
-application files are still empty. The setup files are finished.
+The **backend starts**. It has a health check, the database tables and the core
+maths, but no movie, account or recommendation endpoints yet. The frontend and
+the `Jenkinsfile` are still empty files.
 
 | Part | State |
 |---|---|
 | Setup files (`.gitignore`, `.env.example`, `docker-compose.yml`, `requirements.txt`, `pyproject.toml`) | done |
 | Documentation (this file, `CONTRIBUTING.md`, `docs/build-plan.md`) | done |
-| Database schema, backend, frontend, tests, `Jenkinsfile` | **not started** — files exist, 0 bytes |
+| Database: the 8 tables (`db/schema.sql`) and `scripts/init_db.py` | done |
+| Backend core: settings, database connection, `GET /health`, paging and scoring maths, password hashing | done — 34 tests pass |
+| Backend endpoints: movies (TMDB), accounts, likes and history, recommendations | **not started** — phases 4–8 |
+| Frontend, `Jenkinsfile` | **not started** — files exist, 0 bytes |
 
 What that means for the setup steps below:
 
@@ -37,11 +41,11 @@ What that means for the setup steps below:
 |---|---|
 | 1. Clone and configure | yes |
 | 2. Start the database | yes |
-| 3. Start the backend | **not yet** — needs `app/main.py`, `db/schema.sql`, `scripts/init_db.py` |
+| 3. Start the backend | **yes** — `/health` and `/docs` work. `seed_data` does nothing yet (phase 6), and no endpoint uses the TMDB token yet |
 | 4. Start the frontend | **not yet** — needs `frontend/package.json` |
-| Run the tests | **not yet** — `pytest` reports *"no tests ran"* until the first test exists |
+| Run the tests | **yes** — `pytest -q` in `backend/` passes |
 
-The next job is **Phase 0** in [docs/build-plan.md](docs/build-plan.md): commit this work, then create the `dev` branch.
+The next job is **Phase 3** in [docs/build-plan.md](docs/build-plan.md): the Jenkins pipeline.
 Update this section whenever a row changes. Delete it when every row says yes.
 
 ---
@@ -212,7 +216,7 @@ npm run dev
 | `docker compose up` fails: port 5432 is in use | Another PostgreSQL is running. Stop it, or change the port to `"5433:5432"` in `docker-compose.yml` **and** in `DATABASE_URL` |
 | `cinematch-db` never becomes healthy | Run `docker compose logs db` and read the last lines |
 | TMDB answers `401` | `TMDB_API_TOKEN` is empty or wrong. Use the Read Access Token, not the API Key |
-| `pytest` says *"no tests ran"* | Expected until the first test is written |
+| `pytest` says *"No module named 'app'"* | Run it from `backend/`, not from the repository root |
 
 ---
 
