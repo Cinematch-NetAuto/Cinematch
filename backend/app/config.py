@@ -16,8 +16,10 @@ load_dotenv(ENV_FILE)  # a missing file is fine: the defaults below are used
 
 # --- Database ---------------------------------------------------------------
 # Same user, password and name as docker-compose.yml (local development only).
+# 127.0.0.1, not "localhost": on some Windows PCs "localhost" tries IPv6 first
+# and each new connection waits about 20 seconds before falling back.
 DATABASE_URL = os.getenv(
-    "DATABASE_URL", "postgresql+psycopg://cinematch:cinematch@localhost:5432/cinematch"
+    "DATABASE_URL", "postgresql+psycopg://cinematch:cinematch@127.0.0.1:5432/cinematch"
 )
 
 # --- TMDB -------------------------------------------------------------------

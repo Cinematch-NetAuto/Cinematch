@@ -187,7 +187,7 @@ each on their own branch. **After this phase `pytest -q` passes**, so the
 
 | ✓ | # | Owner | Commit message | Files | Done when |
 |---|---|---|---|---|---|
-| [ ] | 23 | Dev 1 | `test: add shared fixtures client, db and auth_headers` | `backend/tests/conftest.py` | A new test file needs no setup code of its own |
+| [ ] | 23 | Dev 1 | `test: add shared fixtures client, db and auth_headers` | `backend/tests/conftest.py` `backend/app/config.py` `.env.example` | A new test file needs no setup code of its own |
 | [ ] | 24 | Dev 3 | `test: register, login and protected route` | `backend/tests/test_api_auth.py` | Register → login → `/api/users/me` gives 200 → the same call without a token gives 401 |
 | [ ] | 25 | Dev 1 | `feat: add seed_data script` | `backend/scripts/seed_data.py` | `python -m scripts.seed_data` on an empty database adds 19 genres, 3 demo users and some likes. The demo users can log in |
 | [ ] | 26 | Dev 1 | `docs: README status — tests and demo data` | `README.md` | Status table updated |
@@ -197,6 +197,8 @@ each on their own branch. **After this phase `pytest -q` passes**, so the
 >   you develop on. Create it once with
 >   `docker exec cinematch-db createdb -U cinematch cinematch_test`.
 > - Tests must never call TMDB. Replace `app.tmdb` with a mock.
+> - Use `127.0.0.1`, not `localhost`, in `DATABASE_URL`: on some Windows PCs
+>   "localhost" tries IPv6 first and every new connection waits about 20 seconds.
 > - Jenkins now needs to reach PostgreSQL too. If Jenkins runs in Docker, the database
 >   host is `host.docker.internal`, not `localhost`.
 > - A like points at a row in `movies`, so the seed script must insert those films first.
