@@ -5,12 +5,23 @@ same names. schema.sql creates the tables; these classes only describe them,
 so a change to a table means editing both files. Models hold no logic.
 Hot file: tell the team before you edit it.
 
-Ratings, watch history and preferences are added in the next step.
+All 8 tables are here. The indexes live only in schema.sql.
 """
 
 from datetime import date, datetime
 
-from sqlalchemy import BigInteger, DateTime, ForeignKey, Numeric, Text, func
+from sqlalchemy import (
+    ARRAY,
+    BigInteger,
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    Integer,
+    Numeric,
+    SmallInteger,
+    Text,
+    func,
+)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -76,3 +87,47 @@ class TmdbCache(Base):
     cache_key: Mapped[str] = mapped_column(Text, primary_key=True)  # "search:inception:1"
     payload: Mapped[str] = mapped_column(Text)  # TMDB's JSON answer, as text
     fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class Rating(Base):
+    """A like (+1) or a dislike (-1). One per user and film: rating again replaces it."""
+
+    __tablename__ = "ratings"
+    __table_args__ = (CheckConstraint("value IN (-1, 1)", name="ratings_value_check"),)
+
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    )
+    movie_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("movies.tmdb_id"), primary_key=True
+    )
+    value: Mapped[int] = mapped_column(SmallInteger)  # +1 like, -1 dislike
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class WatchHistory(Base):
+    """One "I watched this" event. The same film can be watched more than once."""
+
+    __tablename__ = "watch_history"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    movie_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("movies.tmdb_id"))
+    watched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class UserPreferences(Base):
+    """What a user picked: starter genres (the cold-start fix), years, country, minimum rating."""
+
+    __tablename__ = "user_preferences"
+
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    )
+    preferred_genres: Mapped[list[int]] = mapped_column(ARRAY(Integer), server_default="{}")
+    year_from: Mapped[int | None]
+    year_to: Mapped[int | None]
+    preferred_region: Mapped[str | None] = mapped_column(Text)  # country code, e.g. "AU"
+    min_vote_average: Mapped[float] = mapped_column(
+        Numeric(4, 2, asdecimal=False), server_default="0"
+    )
