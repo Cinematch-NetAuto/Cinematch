@@ -7,11 +7,17 @@ Routers are added here one at a time, in the step that gives each one its
 first endpoint. Hot file: tell the team before you edit it.
 """
 
+import logging
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import CORS_ORIGINS
+from app.routers import movies
 from app.schemas import HealthOut
+
+# Show our own INFO lines ("TMDB GET ...", "cache hit ...") in the server log.
+logging.basicConfig(level=logging.INFO, format="%(levelname)s:     %(name)s %(message)s")
 
 app = FastAPI(title="CineMatch API", version="0.1.0")
 
@@ -24,6 +30,8 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PATCH", "DELETE"],
     allow_headers=["Authorization", "Content-Type"],
 )
+
+app.include_router(movies.router)
 
 
 @app.get("/health", response_model=HealthOut, tags=["health"])
