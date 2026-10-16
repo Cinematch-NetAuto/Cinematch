@@ -19,7 +19,7 @@ Work phase by phase, step by step.
 ```bash
 git checkout dev
 git pull origin dev
-git checkout -b feat/<initials>-<phase-name>
+git checkout -b feat/<phase-name>
 ```
 
 **Each step** — read your change, run the step's check, then commit only that step's files:
@@ -29,15 +29,15 @@ git diff
 cd backend && pytest -q && ruff check . && cd ..   # from Phase 1 on
 git add <the files in the step>
 git commit -m "<the commit message in the step>"
-git push -u origin feat/<initials>-<phase-name>   # later pushes: just  git push
+git push -u origin feat/<phase-name>   # later pushes: just  git push
 ```
 
 Use `git add <files>`, not `git add -A` or `git add .`. You see exactly what goes in.
 
 **End of a phase:**
 
-1. If you used an AI tool in this phase, add the entry to `docs/ai-usage-log.md` and
-   commit it: `docs: log AI use for phase <N>`.
+1. If you used an AI tool in this phase, add it to your own AI-use note (date, tool,
+   what you asked, what you kept).
 2. Open a pull request into `dev`. Review it out loud with a teammate. The teammate merges.
 3. Everyone runs `git checkout dev` and `git pull origin dev`.
 4. If the app runs end to end, Dev 1 merges `dev` into `main` with a pull request.
@@ -122,7 +122,7 @@ each on their own branch. **After this phase `pytest -q` passes**, so the
 
 | ✓ | # | Commit message | Files | Done when |
 |---|---|---|---|---|
-| [ ] | 12 | `ci: add Jenkinsfile with install, lint and test stages` | `Jenkinsfile` `jenkins/Dockerfile` `docker-compose.yml` | Jenkins runs on a push and goes green. Break one test on purpose → it goes red. Screenshot both for the presentation |
+| [ ] | 12 | `ci: add Jenkinsfile with install, lint and test stages` | `Jenkinsfile` `jenkins/Dockerfile` `docker-compose.yml` | Jenkins runs on a push and goes green. Break one test on purpose → it goes red. Screenshot both |
 
 > **Traps**
 > - The official Jenkins image has no Python. `jenkins/Dockerfile` adds it.
@@ -134,7 +134,7 @@ each on their own branch. **After this phase `pytest -q` passes**, so the
 > - Break the test on a **throwaway branch**, screenshot the red build, then delete
 >   the branch. The real history stays clean.
 > - If Jenkins takes more than one day to set up, stop. Add a GitHub Actions
->   workflow instead, keep the `Jenkinsfile`, and present the comparison.
+>   workflow instead, keep the `Jenkinsfile`, and document the comparison.
 > - The frontend build stage comes later, in step 39.
 
 ---
@@ -316,19 +316,19 @@ each on their own branch. **After this phase `pytest -q` passes**, so the
 
 ---
 
-## Phase 15 — Feature freeze, evidence and submission
+## Phase 15 — Feature freeze, checks and release
 
 **Needs:** all the phases above. **No new features from here on** — only fixes,
-tests, docs and rehearsal.
+tests, docs and demo practice.
 
 | ✓ | # | Owner | Commit message | Files | Done when |
 |---|---|---|---|---|---|
 | [ ] | 55 | Dev 3 | `docs: add manual test checklist` | `docs/manual-tests.md` | 15 or more click-through steps that someone else can follow |
 | [ ] | 56 | Dev 4 | `docs: add recommender evaluation` | `docs/evaluation.md` (new) | Precision@10 before and after one weight change: two numbers and what changed |
 | [ ] | 57 | everyone | `docs: complete decisions and glossary` | `docs/decisions.md` `docs/glossary.md` | At least 8 decisions, each with the rejected option. Every term someone asked about |
-| [ ] | 58 | everyone | `docs: complete AI usage log` | `docs/ai-usage-log.md` | Every entry has the tool, version, prompt and what was kept |
+| [ ] | 58 | everyone | *(no commit — AI-use notes)* | — | Everyone's AI-use notes are complete: tool, version, prompt and what was kept |
 | [ ] | 59 | Dev 1 | `docs: final README with screenshots` | `README.md` `docs/screenshots/` | Status section removed. A teammate sets up on a clean laptop without asking a question |
-| [ ] | 60 | Dev 1 | *(no commit — release)* | — | Pull request `dev` → `main`, merged. Then `git tag v1.0-submission` and `git push origin v1.0-submission` |
+| [ ] | 60 | Dev 1 | *(no commit — release)* | — | Pull request `dev` → `main`, merged. Then `git tag v1.0` and `git push origin v1.0` |
 
 ---
 
@@ -338,10 +338,10 @@ Cut from the top. Never cut the last row.
 
 | Cut | Steps affected | Cost |
 |---|---|---|
-| 1. Jenkins → GitHub Actions (keep the `Jenkinsfile`, present the comparison) | 12, 39 | Small |
+| 1. Jenkins → GitHub Actions (keep the `Jenkinsfile`, document the comparison) | 12, 39 | Small |
 | 2. Library → one list instead of three tabs | 49 | Small |
 | 3. Preferences page → fold into Register | 51 | Medium — lose the "change minimum rating" demo |
-| 4. FilterPanel → genre and year only | 45 | Medium — the brief asks for region |
-| 5. Language switch | 52 | Medium — the brief asks for it |
-| 6. Evaluation → describe it in words only | 56 | Medium — lose the "we measured it" slide |
+| 4. FilterPanel → genre and year only | 45 | Medium — the requirements ask for region |
+| 5. Language switch | 52 | Medium — the requirements ask for it |
+| 6. Evaluation → describe it in words only | 56 | Medium — lose the "we measured it" result |
 | **Never cut** | 25, 30 (reasons), 53, 59, all tests | Demo data, offline demo, unit tests, recommendation reasons, README |

@@ -28,15 +28,15 @@ request.** Take the next open step in your lane.
 ## 2. Branches
 
 ```
-main  <-  dev  <-  feat/<initials>-<what>
+main  <-  dev  <-  feat/<what>
 ```
 
 | Branch | Purpose | Who writes to it |
 |---|---|---|
 | `main` | Always runs. Demo-ready. Updated when a phase is merged and demoed | Dev 1 only, by merging `dev` |
 | `dev` | The shared workspace. **Default branch** | Pull requests only |
-| `feat/<initials>-<what>` | Your work, e.g. `feat/jd-search-api` | You |
-| `fix/<initials>-<what>` | A bug fix, e.g. `fix/jd-null-poster` | You |
+| `feat/<what>` | Your work, e.g. `feat/search-api` | You |
+| `fix/<what>` | A bug fix, e.g. `fix/null-poster` | You |
 
 **Never push to `main`. Never merge your own pull request.**
 
@@ -82,8 +82,8 @@ chore: pin pytest-cov
    Then the reviewer approves and merges.
 4. **Rotate reviewers.** Never the same pair twice in a row.
 
-The read-aloud review is not bureaucracy. The presentation asks every one of us
-to explain every part of the app. This is the practice for that.
+The read-aloud review is not bureaucracy. Every one of us should be able to
+explain every part of the app. This is how we get there.
 
 The pull request template has a checklist. Fill it in.
 
@@ -176,10 +176,9 @@ We report coverage. We do not block merges on a coverage number.
 | [docs/decisions.md](docs/decisions.md) | You choose between two real options. Write down the one you rejected and why |
 | [docs/glossary.md](docs/glossary.md) | Someone has to ask what a word means |
 | [docs/manual-tests.md](docs/manual-tests.md) | A feature can be clicked through in the browser |
-| [docs/ai-usage-log.md](docs/ai-usage-log.md) | **You used any AI tool** — same day, with the tool, version and prompt |
 
-The AI usage log is required by the assessment. Write it the same day. A log
-reconstructed at the end is obvious and costs marks.
+Used an AI tool? Keep your own short note the same day: the date, the tool and
+version, what you asked, and what you kept. The team collects these notes.
 
 ---
 

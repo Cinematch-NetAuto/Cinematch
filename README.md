@@ -5,7 +5,7 @@ search and browse films, like or dislike them and mark them watched. CineMatch t
 recommends films back to you, each with a written reason — *"Because you liked
 Inception"*.
 
-Team project for TAFE NSW **ITNET205A Network Automation**, Assessment 3.
+A team project by four developers.
 Everything runs on your own computer. There is no hosted version.
 
 | | |
@@ -248,8 +248,8 @@ Cinematch/
 │       ├── components/        MovieCard, MovieGrid, FilterPanel, Paginator, ...
 │       ├── pages/             one file per screen (9 screens)
 │       └── styles/            tokens.css (all colours) and global.css
-├── docs/                      build plan, decisions, glossary, manual tests, AI log
-├── docker-compose.yml         PostgreSQL only
+├── docs/                      build plan, decisions, glossary, manual tests
+├── docker-compose.yml         PostgreSQL, plus Jenkins on request
 ├── Jenkinsfile                the CI pipeline
 └── .env.example               settings template — copy to .env
 ```
@@ -312,7 +312,6 @@ request into `dev`, get one teammate to review it, never push to `main`.
 | [docs/decisions.md](docs/decisions.md) | Each design decision and the option we rejected |
 | [docs/glossary.md](docs/glossary.md) | Every project term, in plain words |
 | [docs/manual-tests.md](docs/manual-tests.md) | Click-through test steps |
-| [docs/ai-usage-log.md](docs/ai-usage-log.md) | Every use of an AI tool — required by the assessment |
 
 ## Attribution and licence
 
