@@ -14,6 +14,14 @@ pipeline {
         disableConcurrentBuilds()           // one build at a time per branch
     }
 
+    environment {
+        // Jenkins and the database share the Docker network from docker-compose.yml,
+        // so the database host is "db". The tests use "<name>_test", here
+        // cinematch_ci_test: never the same database as a test run on a laptop.
+        // The user and password are the public development defaults, not a secret.
+        DATABASE_URL = 'postgresql+psycopg://cinematch:cinematch@db:5432/cinematch_ci'
+    }
+
     stages {
         stage('Backend: install') {
             steps {

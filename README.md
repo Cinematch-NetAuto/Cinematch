@@ -22,18 +22,21 @@ then pick a task from [docs/build-plan.md](docs/build-plan.md).
 
 ## Current status — 16 October 2026
 
-The **backend starts**. It has a health check, the database tables and the core
-maths, but no movie, account or recommendation endpoints yet. The frontend and
-the `Jenkinsfile` are still empty files.
+The **backend works for movies and accounts**: title search, filtered browsing and
+film pages from TMDB (with a cache), sign-up, login and "who am I". Likes, watch
+history and recommendations come next. The frontend is not started.
 
 | Part | State |
 |---|---|
 | Setup files (`.gitignore`, `.env.example`, `docker-compose.yml`, `requirements.txt`, `pyproject.toml`) | done |
 | Documentation (this file, `CONTRIBUTING.md`, `docs/build-plan.md`) | done |
-| Database: the 8 tables (`db/schema.sql`) and `scripts/init_db.py` | done |
-| Backend core: settings, database connection, `GET /health`, paging and scoring maths, password hashing | done — 34 tests pass |
-| Backend endpoints: movies (TMDB), accounts, likes and history, recommendations | **not started** — phases 4–8 |
-| Frontend, `Jenkinsfile` | **not started** — files exist, 0 bytes |
+| Database: the 8 tables (`db/schema.sql`), `scripts/init_db.py`, demo data (`scripts/seed_data.py`) | done |
+| Backend: movies — genres, title search, filters, film page, TMDB cache | done |
+| Backend: accounts — register, login, `GET /api/users/me` | done |
+| Tests — unit tests and API tests on a separate test database | done — 54 tests pass |
+| Jenkins pipeline: install, lint, test on every push | done — `docker compose up -d jenkins`, then http://localhost:8081 |
+| Backend: likes, watch history, recommendations | **not started** — phases 7–8 |
+| Frontend | **not started** — files exist, 0 bytes |
 
 What that means for the setup steps below:
 
@@ -41,11 +44,11 @@ What that means for the setup steps below:
 |---|---|
 | 1. Clone and configure | yes |
 | 2. Start the database | yes |
-| 3. Start the backend | **yes** — `/health` and `/docs` work. `seed_data` does nothing yet (phase 6), and no endpoint uses the TMDB token yet |
+| 3. Start the backend | **yes** — every endpoint so far is on `/docs`. `seed_data` adds 3 demo users: `ava@example.com`, `ben@example.com`, `cleo@example.com`, password `demo-password` |
 | 4. Start the frontend | **not yet** — needs `frontend/package.json` |
-| Run the tests | **yes** — `pytest -q` in `backend/` passes |
+| Run the tests | **yes** — `pytest -q` in `backend/`; the API tests need the database from step 2 |
 
-The next job is **Phase 3** in [docs/build-plan.md](docs/build-plan.md): the Jenkins pipeline.
+The next job is **Phase 7** in [docs/build-plan.md](docs/build-plan.md): likes and watch history.
 Update this section whenever a row changes. Delete it when every row says yes.
 
 ---
@@ -217,6 +220,7 @@ npm run dev
 | `cinematch-db` never becomes healthy | Run `docker compose logs db` and read the last lines |
 | TMDB answers `401` | `TMDB_API_TOKEN` is empty or wrong. Use the Read Access Token, not the API Key |
 | `pytest` says *"No module named 'app'"* | Run it from `backend/`, not from the repository root |
+| The first request (or each test run) waits about 20 seconds | `DATABASE_URL` says `localhost`. Use `127.0.0.1`: on some Windows PCs `localhost` tries IPv6 first |
 
 ---
 
@@ -250,6 +254,7 @@ Cinematch/
 │       └── styles/            tokens.css (all colours) and global.css
 ├── docs/                      build plan, decisions, glossary, manual tests
 ├── docker-compose.yml         PostgreSQL, plus Jenkins on request
+├── jenkins/Dockerfile         Jenkins with Python, for the pipeline
 ├── Jenkinsfile                the CI pipeline
 └── .env.example               settings template — copy to .env
 ```
