@@ -122,11 +122,17 @@ each on their own branch. **After this phase `pytest -q` passes**, so the
 
 | ✓ | # | Commit message | Files | Done when |
 |---|---|---|---|---|
-| [ ] | 12 | `ci: add Jenkinsfile with install, lint and test stages` | `Jenkinsfile` | Jenkins runs on a push and goes green. Break one test on purpose → it goes red. Screenshot both for the presentation |
+| [ ] | 12 | `ci: add Jenkinsfile with install, lint and test stages` | `Jenkinsfile` `jenkins/Dockerfile` `docker-compose.yml` | Jenkins runs on a push and goes green. Break one test on purpose → it goes red. Screenshot both for the presentation |
 
 > **Traps**
+> - The official Jenkins image has no Python. `jenkins/Dockerfile` adds it.
+>   Start Jenkins with `docker compose up -d jenkins` → http://localhost:8081.
 > - Secrets go in Jenkins (**Manage Jenkins → Credentials**), never in the `Jenkinsfile`.
-> - Use **Poll SCM** (`H/5 * * * *`). A GitHub webhook cannot reach a home laptop.
+> - Check GitHub on a timer, every 5 minutes. A GitHub webhook cannot reach a home
+>   laptop. In a **Multibranch Pipeline** job this is *Scan triggers → Periodically,
+>   5 minutes*; a plain Pipeline job uses **Poll SCM** (`H/5 * * * *`).
+> - Break the test on a **throwaway branch**, screenshot the red build, then delete
+>   the branch. The real history stays clean.
 > - If Jenkins takes more than one day to set up, stop. Add a GitHub Actions
 >   workflow instead, keep the `Jenkinsfile`, and present the comparison.
 > - The frontend build stage comes later, in step 39.
