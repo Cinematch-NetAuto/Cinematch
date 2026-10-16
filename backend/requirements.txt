@@ -22,6 +22,6 @@ pyjwt==2.10.1             # signed login tokens
 
 # --- Development only ------------------------------------------------------
 pytest==8.3.4             # the test runner
-pytest-cov==6.0.0         # coverage, reported on a slide (pytest --cov=app)
+pytest-cov==6.0.0         # coverage report (pytest --cov=app)
 httpx==0.28.1             # lets tests call our API without a live server
 ruff==0.8.4               # linter, keeps four people's style identical
