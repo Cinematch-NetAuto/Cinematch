@@ -22,9 +22,10 @@ then pick a task from [docs/build-plan.md](docs/build-plan.md).
 
 ## Current status — 16 October 2026
 
-The **backend works for movies and accounts**: title search, filtered browsing and
-film pages from TMDB (with a cache), sign-up, login and "who am I". Likes, watch
-history and recommendations come next. The frontend is not started.
+The **backend is complete** for phases 1–8: films from TMDB (search, filters, film
+pages, with a cache), accounts, likes, dislikes, watch history and personal
+recommendations with reasons. The frontend is not started. The preferences
+endpoints and the language switch come with their screens in phase 13.
 
 | Part | State |
 |---|---|
@@ -33,9 +34,11 @@ history and recommendations come next. The frontend is not started.
 | Database: the 8 tables (`db/schema.sql`), `scripts/init_db.py`, demo data (`scripts/seed_data.py`) | done |
 | Backend: movies — genres, title search, filters, film page, TMDB cache | done |
 | Backend: accounts — register, login, `GET /api/users/me` | done |
-| Tests — unit tests and API tests on a separate test database | done — 54 tests pass |
+| Backend: likes, dislikes, watch history | done |
+| Backend: recommendations — 20 films, each with a score and a reason | done |
+| Tests — unit tests and API tests on a separate test database | done — 80 tests pass |
 | Jenkins pipeline: install, lint, test on every push | done — `docker compose up -d jenkins`, then http://localhost:8081 |
-| Backend: likes, watch history, recommendations | **not started** — phases 7–8 |
+| Backend: preferences endpoints, language switch | **not started** — phase 13 |
 | Frontend | **not started** — files exist, 0 bytes |
 
 What that means for the setup steps below:
@@ -48,7 +51,7 @@ What that means for the setup steps below:
 | 4. Start the frontend | **not yet** — needs `frontend/package.json` |
 | Run the tests | **yes** — `pytest -q` in `backend/`; the API tests need the database from step 2 |
 
-The next job is **Phase 7** in [docs/build-plan.md](docs/build-plan.md): likes and watch history.
+The next job is **Phase 9** in [docs/build-plan.md](docs/build-plan.md): the design and the frontend shell.
 Update this section whenever a row changes. Delete it when every row says yes.
 
 ---
@@ -285,7 +288,7 @@ Once the backend runs, the live list is at http://localhost:8000/docs.
 | `GET /api/movies/search?q=&page=&per_page=` | no | `routers/movies.py` |
 | `GET /api/movies/discover?genres=&year_from=&year_to=&sort=&region=&min_rating=&page=&per_page=` | no | `routers/movies.py` |
 | `GET /api/movies/{tmdb_id}` | no | `routers/movies.py` |
-| `GET` / `PUT` / `DELETE /api/me/likes` · `GET` / `POST /api/me/history` | yes | `routers/library.py` |
+| `GET` / `PUT /api/me/likes` · `DELETE /api/me/likes?tmdb_id=` · `GET` / `POST /api/me/history` | yes | `routers/library.py` |
 | `GET` / `PATCH /api/me/preferences` | yes | `routers/library.py` |
 | `GET /api/me/recommendations` | yes | `routers/recommend.py` |
 
