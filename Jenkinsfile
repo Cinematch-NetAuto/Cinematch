@@ -17,9 +17,12 @@ pipeline {
     environment {
         // Jenkins and the database share the Docker network from docker-compose.yml,
         // so the database host is "db". The tests use "<name>_test", here
-        // cinematch_ci_test: never the same database as a test run on a laptop.
+        // cinematch_ci_0_test or cinematch_ci_1_test: never a laptop's database.
+        // One per executor (build slot): two builds can run at once, for example
+        // dev and a feature branch after a merge, and the tests empty every table
+        // before each test. A shared database let each run delete the other's users.
         // The user and password are the public development defaults, not a secret.
-        DATABASE_URL = 'postgresql+psycopg://cinematch:cinematch@db:5432/cinematch_ci'
+        DATABASE_URL = "postgresql+psycopg://cinematch:cinematch@db:5432/cinematch_ci_${env.EXECUTOR_NUMBER}"
     }
 
     stages {
