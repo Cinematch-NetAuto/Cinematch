@@ -310,8 +310,9 @@ each on their own branch. **After this phase `pytest -q` passes**, so the
 > **Traps**
 > - The language must be part of the TMDB cache key. Otherwise the cache serves the
 >   English copy of a page to someone who chose another language.
-> - `user_preferences` has no language column. The browser keeps the choice and sends
->   it with every request, so it also works for visitors who are not logged in.
+> - Each user already has a language: `users.content_language` (default `en-US`),
+>   returned by `GET /api/users/me`. Save a logged-in user's choice there. A visitor
+>   who is not logged in keeps the choice in the browser.
 
 ---
 
