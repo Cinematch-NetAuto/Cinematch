@@ -197,3 +197,80 @@ img {
 .page-footer p {
   margin: 0 0 var(--s1);
 }
+
+/* ---- Shared pieces ---- */
+
+/* Read by screen readers, invisible on screen. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* The poster grid: 2 columns on a phone, 6 on a laptop, no media query. */
+.poster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--poster-min), 1fr));
+  gap: var(--s4);
+}
+
+/* Main button: a lit marquee bulb. Quiet button: a dusk panel. */
+.button {
+  display: inline-block;
+  padding: var(--s2) var(--s5);
+  border: 1px solid var(--marquee);
+  border-radius: var(--radius-control);
+  background: var(--gradient-bulb);
+  color: var(--night);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.button-quiet {
+  border-color: var(--hairline);
+  background: var(--gradient-panel);
+  color: var(--screen);
+}
+
+.button:hover {
+  filter: brightness(1.1);
+  text-decoration: none;
+}
+
+.button:active {
+  transform: translateY(1px);
+}
+
+.button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---- Loading, empty and error states (States.jsx) ---- */
+
+.poster-block {
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-poster);
+  background: var(--gradient-panel);
+}
+
+.state {
+  padding: var(--s6) 0;
+}
+
+.state-title {
+  margin-bottom: var(--s2);
+  font-size: var(--fs-card);
+  font-weight: 700;
+}
+
+.state-error {
+  color: var(--exit-sign);
+}
+
+.state .button {
+  margin-top: var(--s2);
+}
