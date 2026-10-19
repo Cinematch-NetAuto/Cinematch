@@ -200,7 +200,9 @@ each on their own branch. **After this phase `pytest -q` passes**, so the
 >   "localhost" tries IPv6 first and every new connection waits about 20 seconds.
 > - Jenkins now needs to reach PostgreSQL too. Jenkins and the database share the
 >   docker-compose network, so the host is `db`. The Jenkinsfile sets `DATABASE_URL`
->   to a separate `cinematch_ci` name, so CI tests use `cinematch_ci_test`.
+>   to a separate name per executor (build slot), so CI tests use `cinematch_ci_0_test`
+>   or `cinematch_ci_1_test`. Two builds can run at once, and a shared test database
+>   lets each run empty the other's tables.
 > - A like points at a row in `movies`, so the seed script must insert those films first.
 
 ---
