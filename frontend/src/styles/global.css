@@ -92,3 +92,108 @@ img {
   background: var(--marquee);
   color: var(--night);
 }
+
+/* ---- The page frame: Layout, NavBar and footer ---- */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.page-main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--s6) var(--gutter);
+}
+
+/* Hidden above the page until a keyboard user tabs to it. */
+.skip-link {
+  position: absolute;
+  top: calc(-1 * var(--s7));
+  left: var(--s2);
+  padding: var(--s2) var(--s4);
+  border-radius: var(--radius-control);
+  background: var(--marquee);
+  color: var(--night);
+}
+
+.skip-link:focus {
+  top: var(--s2);
+}
+
+.nav {
+  border-bottom: 1px solid var(--hairline-gold);
+}
+
+.nav-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s2) var(--s6);
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--s3) var(--gutter);
+}
+
+.nav-name {
+  font-family: var(--font-display);
+  font-size: var(--fs-section);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tracking-name);
+  text-transform: uppercase;
+  color: var(--screen);
+}
+
+.nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1) var(--s5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nav-account {
+  margin-left: auto;
+}
+
+/* When the nav bar wraps onto several lines, every line starts on the left. */
+@media (max-width: 900px) {
+  .nav-account {
+    margin-left: 0;
+  }
+}
+
+.nav-link {
+  display: inline-block;
+  padding: var(--s1) 0;
+  font-size: var(--fs-caption);
+  color: var(--programme);
+}
+
+.nav-name:hover,
+.nav-link:hover {
+  color: var(--screen);
+  text-decoration: none;
+}
+
+.nav-link.active {
+  color: var(--marquee);
+}
+
+.page-footer {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--s5) var(--gutter) var(--s6);
+  border-top: 1px solid var(--hairline);
+  font-size: var(--fs-caption);
+  color: var(--programme);
+}
+
+.page-footer p {
+  margin: 0 0 var(--s1);
+}

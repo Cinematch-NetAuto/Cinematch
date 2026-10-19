@@ -1,7 +1,8 @@
 // The app's top component: which page shows at which address.
-// Step 37 wraps these pages in the layout (nav bar and footer); step 41 keeps
+// Every page sits inside the Layout (nav bar and footer). Step 41 keeps
 // logged-out visitors away from the /me/... pages.
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom'
+import Layout from './components/Layout.jsx'
 import Discover from './pages/Discover.jsx'
 import Home from './pages/Home.jsx'
 import Library from './pages/Library.jsx'
@@ -28,16 +29,18 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/search" element={<Search />} />
-        <Route path="/discover" element={<Discover />} />
-        <Route path="/movie/:id" element={<MovieDetail />} />
-        <Route path="/me/recommendations" element={<Recommendations />} />
-        <Route path="/me/library" element={<Library />} />
-        <Route path="/me/preferences" element={<Preferences />} />
-        <Route path="*" element={<NotFound />} />
+        <Route element={<Layout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/search" element={<Search />} />
+          <Route path="/discover" element={<Discover />} />
+          <Route path="/movie/:id" element={<MovieDetail />} />
+          <Route path="/me/recommendations" element={<Recommendations />} />
+          <Route path="/me/library" element={<Library />} />
+          <Route path="/me/preferences" element={<Preferences />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   )
