@@ -50,7 +50,7 @@ backgrounds, no decoration.
 
 | Typeface | Role | Why |
 |---|---|---|
-| League Gothic (`@fontsource/league-gothic`) | Page titles, section headings, film titles on the film page | The tall, narrow capitals of classic film-poster title blocks. Its letters are capitals by design |
+| League Gothic (`@fontsource/league-gothic`) | Page titles, section headings, film titles on the film page | The tall, narrow letters of classic film-poster title blocks. Headings in it are set in capitals by the stylesheet (`text-transform: uppercase`), as on a poster |
 | Atkinson Hyperlegible (`@fontsource/atkinson-hyperlegible`) | All other text: body, buttons, labels, numbers | Designed to stay readable at small sizes, which matters for light text on a dark page |
 
 - Both are installed from npm and bundled with the app, so the offline demo has
@@ -58,8 +58,8 @@ backgrounds, no decoration.
 - Sizes, in px: 14 (captions), 16 (body), 20 (card titles), 28 (section headings),
   40 (page titles), 64 (the film title on the film page).
 - Line height: 1.5 for text, 1.05 for League Gothic headings.
-- Labels, buttons and helper text use sentence case. Only League Gothic is in
-  capitals, and only because the typeface is.
+- Labels, buttons and helper text use sentence case. Only League Gothic headings
+  are in capitals.
 - Text lines stay under 75 characters.
 
 ## Shape and space
