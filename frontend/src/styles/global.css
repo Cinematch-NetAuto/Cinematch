@@ -1,0 +1,276 @@
+/* Base styles for every page. Uses only the variables in tokens.css.
+ *
+ * The fonts come from npm packages (@fontsource) and are bundled with the app,
+ * so they work without internet (the offline demo).
+ */
+@import '@fontsource/league-gothic/400.css';
+@import '@fontsource/atkinson-hyperlegible/400.css';
+@import '@fontsource/atkinson-hyperlegible/700.css';
+@import './tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+}
+
+/* The sky glow covers the first screen; below it the page is plain Night. */
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--gradient-sky) top center / 100% 100vh no-repeat, var(--night);
+  color: var(--screen);
+  font-family: var(--font-text);
+  font-size: var(--fs-body);
+  line-height: var(--lh-text);
+}
+
+/* League Gothic is for page titles and section headings only, set in capitals
+   like a film poster's title block. */
+h1,
+h2 {
+  margin: 0 0 var(--s3);
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: var(--lh-display);
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: var(--fs-page);
+}
+
+h2 {
+  font-size: var(--fs-section);
+}
+
+h3 {
+  margin: 0 0 var(--s2);
+  font-size: var(--fs-card);
+  font-weight: 700;
+}
+
+p {
+  margin: 0 0 var(--s3);
+  max-width: var(--measure);
+}
+
+a {
+  color: var(--marquee);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Keyboard users always see where they are. */
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+::selection {
+  background: var(--marquee);
+  color: var(--night);
+}
+
+/* ---- The page frame: Layout, NavBar and footer ---- */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.page-main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--s6) var(--gutter);
+}
+
+/* Hidden above the page until a keyboard user tabs to it. */
+.skip-link {
+  position: absolute;
+  top: calc(-1 * var(--s7));
+  left: var(--s2);
+  padding: var(--s2) var(--s4);
+  border-radius: var(--radius-control);
+  background: var(--marquee);
+  color: var(--night);
+}
+
+.skip-link:focus {
+  top: var(--s2);
+}
+
+.nav {
+  border-bottom: 1px solid var(--hairline-gold);
+}
+
+.nav-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s2) var(--s6);
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--s3) var(--gutter);
+}
+
+.nav-name {
+  font-family: var(--font-display);
+  font-size: var(--fs-section);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tracking-name);
+  text-transform: uppercase;
+  color: var(--screen);
+}
+
+.nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1) var(--s5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nav-account {
+  margin-left: auto;
+}
+
+/* When the nav bar wraps onto several lines, every line starts on the left. */
+@media (max-width: 900px) {
+  .nav-account {
+    margin-left: 0;
+  }
+}
+
+.nav-link {
+  display: inline-block;
+  padding: var(--s1) 0;
+  font-size: var(--fs-caption);
+  color: var(--programme);
+}
+
+.nav-name:hover,
+.nav-link:hover {
+  color: var(--screen);
+  text-decoration: none;
+}
+
+.nav-link.active {
+  color: var(--marquee);
+}
+
+.page-footer {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--s5) var(--gutter) var(--s6);
+  border-top: 1px solid var(--hairline);
+  font-size: var(--fs-caption);
+  color: var(--programme);
+}
+
+.page-footer p {
+  margin: 0 0 var(--s1);
+}
+
+/* ---- Shared pieces ---- */
+
+/* Read by screen readers, invisible on screen. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* The poster grid: 2 columns on a phone, 6 on a laptop, no media query. */
+.poster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--poster-min), 1fr));
+  gap: var(--s4);
+}
+
+/* Main button: a lit marquee bulb. Quiet button: a dusk panel. */
+.button {
+  display: inline-block;
+  padding: var(--s2) var(--s5);
+  border: 1px solid var(--marquee);
+  border-radius: var(--radius-control);
+  background: var(--gradient-bulb);
+  color: var(--night);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.button-quiet {
+  border-color: var(--hairline);
+  background: var(--gradient-panel);
+  color: var(--screen);
+}
+
+.button:hover {
+  filter: brightness(1.1);
+  text-decoration: none;
+}
+
+.button:active {
+  transform: translateY(1px);
+}
+
+.button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---- Loading, empty and error states (States.jsx) ---- */
+
+.poster-block {
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-poster);
+  background: var(--gradient-panel);
+}
+
+.state {
+  padding: var(--s6) 0;
+}
+
+.state-title {
+  margin-bottom: var(--s2);
+  font-size: var(--fs-card);
+  font-weight: 700;
+}
+
+.state-error {
+  color: var(--exit-sign);
+}
+
+.state .button {
+  margin-top: var(--s2);
+}

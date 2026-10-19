@@ -240,13 +240,13 @@ each on their own branch. **After this phase `pytest -q` passes**, so the
 
 | ✓ | # | Commit message | Files | Done when |
 |---|---|---|---|---|
-| [ ] | 33 | `docs: add the design plan` | `docs/design.md` (new) | One line each: who uses CineMatch, and the one job of the site. A palette of 4–6 named colours with hex values. The typefaces and their roles. A sketch of Home and the poster grid. Three design principles. A short list of the generic looks you checked against, and what you changed |
-| [ ] | 34 | `feat: set up React with Vite` | `frontend/package.json` `frontend/package-lock.json` `frontend/vite.config.js` `frontend/index.html` `frontend/src/main.jsx` `frontend/src/App.jsx` | `npm run dev` serves a page on 5173. `/api` is proxied to `http://127.0.0.1:8000`. `npm run build` passes |
-| [ ] | 35 | `feat: add design tokens and global styles` | `frontend/src/styles/tokens.css` `frontend/src/styles/global.css` `frontend/package.json` `frontend/package-lock.json` | Colours, fonts, spacing and radius from `docs/design.md`, as CSS variables in `tokens.css` only. Fonts are installed locally, not loaded from the internet |
-| [ ] | 36 | `feat: add all nine routes with placeholder pages` | `frontend/src/App.jsx` `frontend/src/pages/*.jsx` `frontend/package.json` `frontend/package-lock.json` | Routes use `react-router-dom`. Each URL shows its page name: `/` `/login` `/register` `/search` `/discover` `/movie/:id` `/me/recommendations` `/me/library` `/me/preferences` |
-| [ ] | 37 | `feat: add Layout, NavBar and footer` | `frontend/src/components/Layout.jsx` `frontend/src/components/NavBar.jsx` | The nav bar moves between all nine screens. The footer shows the TMDB notice: *"This product uses the TMDB API but is not endorsed or certified by TMDB."* |
-| [ ] | 38 | `feat: add loading, empty and error states` | `frontend/src/components/States.jsx` | Three small components every list screen can use |
-| [ ] | 39 | `ci: add frontend build stage to Jenkinsfile` | `Jenkinsfile` `jenkins/Dockerfile` | The image gets Node.js 20 or newer: `docker compose build jenkins`, then `docker compose up -d jenkins`. Jenkins runs `npm ci && npm run build` and stays green |
+| [x] | 33 | `docs: add the design plan` | `docs/design.md` (new) | One line each: who uses CineMatch, and the one job of the site. A palette of 4–6 named colours with hex values. The typefaces and their roles. A sketch of Home and the poster grid. Three design principles. A short list of the generic looks you checked against, and what you changed |
+| [x] | 34 | `feat: set up React with Vite` | `frontend/package.json` `frontend/package-lock.json` `frontend/vite.config.js` `frontend/index.html` `frontend/src/main.jsx` `frontend/src/App.jsx` | `npm run dev` serves a page on 5173. `/api` is proxied to `http://127.0.0.1:8000`. `npm run build` passes |
+| [x] | 35 | `feat: add design tokens and global styles` | `frontend/src/styles/tokens.css` `frontend/src/styles/global.css` `frontend/src/main.jsx` `frontend/package.json` `frontend/package-lock.json` | Colours, fonts, spacing and radius from `docs/design.md`, as CSS variables in `tokens.css` only. Fonts are installed locally, not loaded from the internet |
+| [x] | 36 | `feat: add all nine routes with placeholder pages` | `frontend/src/App.jsx` `frontend/src/pages/*.jsx` `frontend/package.json` `frontend/package-lock.json` | Routes use `react-router-dom`. Each URL shows its page name: `/` `/login` `/register` `/search` `/discover` `/movie/:id` `/me/recommendations` `/me/library` `/me/preferences` |
+| [x] | 37 | `feat: add Layout, NavBar and footer` | `frontend/src/components/Layout.jsx` `frontend/src/components/NavBar.jsx` `frontend/src/App.jsx` `frontend/src/styles/global.css` | The nav bar moves between all nine screens. The footer shows the TMDB notice: *"This product uses the TMDB API but is not endorsed or certified by TMDB."* |
+| [x] | 38 | `feat: add loading, empty and error states` | `frontend/src/components/States.jsx` `frontend/src/styles/global.css` | Three small components every list screen can use |
+| [x] | 39 | `ci: add frontend build stage to Jenkinsfile` | `Jenkinsfile` `jenkins/Dockerfile` | The image gets Node.js 20 or newer: `docker compose build jenkins`, then `docker compose up -d jenkins`. Jenkins runs `npm ci && npm run build` and stays green |
 
 > **Traps**
 > - Commit `package-lock.json`. `npm ci` in Jenkins fails without it.
@@ -257,6 +257,9 @@ each on their own branch. **After this phase `pytest -q` passes**, so the
 >   listens on 127.0.0.1 only, and "localhost" can resolve to the IPv6 address first.
 > - The Jenkins image has Python but no Node.js. Step 39 adds Node to
 >   `jenkins/Dockerfile` and rebuilds the image.
+> - After `npm install` of a new package, stop and restart `npm run dev`. A running
+>   dev server can load two copies of React, and the page fails with "Invalid hook
+>   call".
 
 ---
 

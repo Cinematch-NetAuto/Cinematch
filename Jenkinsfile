@@ -2,9 +2,9 @@
 // for every new commit on every branch (a Multibranch Pipeline job that checks
 // GitHub every 5 minutes).
 //
-// Stages run in order: install -> lint -> test. A red stage stops the build.
+// Stages run in order: backend install -> lint -> test, then the frontend
+// build. A red stage stops the build.
 // Secrets never go in this file; they live in Manage Jenkins -> Credentials.
-// The frontend build stage is added in step 39.
 
 pipeline {
     agent any
@@ -45,6 +45,16 @@ pipeline {
             steps {
                 dir('backend') {
                     sh '.venv/bin/pytest --cov=app --junitxml=junit.xml'
+                }
+            }
+        }
+        stage('Frontend: build') {
+            steps {
+                dir('frontend') {
+                    // npm ci installs exactly what package-lock.json lists, and
+                    // fails if the lock file is missing or out of date.
+                    sh 'npm ci --no-audit --no-fund'
+                    sh 'npm run build'
                 }
             }
         }
