@@ -241,18 +241,22 @@ each on their own branch. **After this phase `pytest -q` passes**, so the
 | ✓ | # | Commit message | Files | Done when |
 |---|---|---|---|---|
 | [ ] | 33 | `docs: add the design plan` | `docs/design.md` (new) | One line each: who uses CineMatch, and the one job of the site. A palette of 4–6 named colours with hex values. The typefaces and their roles. A sketch of Home and the poster grid. Three design principles. A short list of the generic looks you checked against, and what you changed |
-| [ ] | 34 | `feat: set up React with Vite` | `frontend/package.json` `frontend/package-lock.json` `frontend/vite.config.js` `frontend/index.html` `frontend/src/main.jsx` `frontend/src/App.jsx` | `npm run dev` serves a page on 5173. `/api` is proxied to port 8000. `npm run build` passes |
+| [ ] | 34 | `feat: set up React with Vite` | `frontend/package.json` `frontend/package-lock.json` `frontend/vite.config.js` `frontend/index.html` `frontend/src/main.jsx` `frontend/src/App.jsx` | `npm run dev` serves a page on 5173. `/api` is proxied to `http://127.0.0.1:8000`. `npm run build` passes |
 | [ ] | 35 | `feat: add design tokens and global styles` | `frontend/src/styles/tokens.css` `frontend/src/styles/global.css` `frontend/package.json` `frontend/package-lock.json` | Colours, fonts, spacing and radius from `docs/design.md`, as CSS variables in `tokens.css` only. Fonts are installed locally, not loaded from the internet |
-| [ ] | 36 | `feat: add all nine routes with placeholder pages` | `frontend/src/App.jsx` `frontend/src/pages/*.jsx` | Each URL shows its page name: `/` `/login` `/register` `/search` `/discover` `/movie/:id` `/me/recommendations` `/me/library` `/me/preferences` |
+| [ ] | 36 | `feat: add all nine routes with placeholder pages` | `frontend/src/App.jsx` `frontend/src/pages/*.jsx` `frontend/package.json` `frontend/package-lock.json` | Routes use `react-router-dom`. Each URL shows its page name: `/` `/login` `/register` `/search` `/discover` `/movie/:id` `/me/recommendations` `/me/library` `/me/preferences` |
 | [ ] | 37 | `feat: add Layout, NavBar and footer` | `frontend/src/components/Layout.jsx` `frontend/src/components/NavBar.jsx` | The nav bar moves between all nine screens. The footer shows the TMDB notice: *"This product uses the TMDB API but is not endorsed or certified by TMDB."* |
 | [ ] | 38 | `feat: add loading, empty and error states` | `frontend/src/components/States.jsx` | Three small components every list screen can use |
-| [ ] | 39 | `ci: add frontend build stage to Jenkinsfile` | `Jenkinsfile` | Jenkins runs `npm ci && npm run build` and stays green |
+| [ ] | 39 | `ci: add frontend build stage to Jenkinsfile` | `Jenkinsfile` `jenkins/Dockerfile` | The image gets Node.js 20 or newer: `docker compose build jenkins`, then `docker compose up -d jenkins`. Jenkins runs `npm ci && npm run build` and stays green |
 
 > **Traps**
 > - Commit `package-lock.json`. `npm ci` in Jenkins fails without it.
 > - The offline demo has no internet, so fonts loaded from a font website would fail.
 >   Install the font as an npm package (for example from `@fontsource`) instead.
 > - The TMDB footer notice is a condition of using the API, not decoration.
+> - Point the Vite proxy at `http://127.0.0.1:8000`, not `localhost`. The backend
+>   listens on 127.0.0.1 only, and "localhost" can resolve to the IPv6 address first.
+> - The Jenkins image has Python but no Node.js. Step 39 adds Node to
+>   `jenkins/Dockerfile` and rebuilds the image.
 
 ---
 
@@ -300,8 +304,14 @@ each on their own branch. **After this phase `pytest -q` passes**, so the
 
 | ✓ | # | Commit message | Files | Done when |
 |---|---|---|---|---|
-| [ ] | 51 | `feat: add preferences endpoints and page` | `backend/app/routers/library.py` `frontend/src/pages/Preferences.jsx` | `GET` and `PATCH /api/me/preferences`. Raise the minimum rating → recommendations change |
-| [ ] | 52 | `feat: switch content language` | `frontend/src/api/client.js` `backend/app/tmdb.py` | Switch language → film titles and overviews change. **`tmdb.py` is Dev 2's file — agree the change with them** |
+| [ ] | 51 | `feat: add preferences endpoints and page` | `backend/app/routers/library.py` `backend/app/schemas.py` `backend/tests/test_api_library.py` `frontend/src/pages/Preferences.jsx` | `GET` and `PATCH /api/me/preferences`, with tests: a change is saved, a bad value gives 422, no token gives 401. Raise the minimum rating → recommendations change |
+| [ ] | 52 | `feat: switch content language` | `frontend/src/api/client.js` `backend/app/tmdb.py` `backend/app/services/movies.py`, the routers that pass the language on, and a test | Switch language → film titles and overviews change. A test shows that two languages get two cache entries. **`tmdb.py` is Dev 2's file — agree the change with them** |
+
+> **Traps**
+> - The language must be part of the TMDB cache key. Otherwise the cache serves the
+>   English copy of a page to someone who chose another language.
+> - `user_preferences` has no language column. The browser keeps the choice and sends
+>   it with every request, so it also works for visitors who are not logged in.
 
 ---
 
@@ -328,8 +338,8 @@ tests, docs and demo practice.
 | ✓ | # | Owner | Commit message | Files | Done when |
 |---|---|---|---|---|---|
 | [ ] | 55 | Dev 3 | `docs: add manual test checklist` | `docs/manual-tests.md` | 15 or more click-through steps that someone else can follow |
-| [ ] | 56 | Dev 4 | `docs: add recommender evaluation` | `docs/evaluation.md` (new) | Precision@10 before and after one weight change: two numbers and what changed |
-| [ ] | 57 | everyone | `docs: complete decisions and glossary` | `docs/decisions.md` `docs/glossary.md` | At least 8 decisions, each with the rejected option. Every term someone asked about |
+| [ ] | 56 | Dev 4 | `docs: add recommender evaluation` | `backend/scripts/evaluate.py` (new) `docs/evaluation.md` (new) | `python -m scripts.evaluate` prints Precision@10: hide some of each demo user's likes, then count how many come back in their top 10. Two numbers, before and after one weight change, and what changed |
+| [ ] | 57 | everyone | `docs: complete decisions and glossary` | `docs/decisions.md` `docs/glossary.md` | At least 8 decisions, each with the rejected option. One of them is why OAuth ("log in with Google") was left out. Every term someone asked about |
 | [ ] | 58 | everyone | *(no commit — AI-use notes)* | — | Everyone's AI-use notes are complete: tool, version, prompt and what was kept |
 | [ ] | 59 | Dev 1 | `docs: final README with screenshots` | `README.md` `docs/screenshots/` | Status section removed. A teammate sets up on a clean laptop without asking a question |
 | [ ] | 60 | Dev 1 | *(no commit — release)* | — | Pull request `dev` → `main`, merged. Then `git tag v1.0` and `git push origin v1.0` |

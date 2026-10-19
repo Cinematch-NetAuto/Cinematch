@@ -45,12 +45,12 @@ main  <-  dev  <-  feat/<what>
 ```bash
 git checkout dev
 git pull origin dev                     # start from the latest work
-git checkout -b feat/jd-search-api      # one branch per task
+git checkout -b feat/search-api         # one branch per task
 
 # ... write code, commit small steps ...
 
 cd backend && pytest -q && ruff check . # both must pass
-git push -u origin feat/jd-search-api
+git push -u origin feat/search-api
 # open a pull request into dev on GitHub
 ```
 
