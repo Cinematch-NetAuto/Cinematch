@@ -259,7 +259,9 @@ each on their own branch. **After this phase `pytest -q` passes**, so the
 >   `jenkins/Dockerfile` and rebuilds the image.
 > - After `npm install` of a new package, stop and restart `npm run dev`. A running
 >   dev server can load two copies of React, and the page fails with "Invalid hook
->   call".
+>   call". Restart it too when the page breaks right after edits to several files
+>   (for example "useAuth() must be used inside <AuthProvider>" although it is):
+>   the hot reload can mix old and new copies of a file.
 
 ---
 
@@ -269,9 +271,9 @@ each on their own branch. **After this phase `pytest -q` passes**, so the
 
 | ✓ | # | Commit message | Files | Done when |
 |---|---|---|---|---|
-| [ ] | 40 | `feat: add apiFetch() for every API call` | `frontend/src/api/client.js` | Adds the token. Throws on errors. On 401, clears the token and goes to `/login`. **Every page waits on this — do it first** |
-| [ ] | 41 | `feat: add AuthContext and protected routes` | `frontend/src/context/AuthContext.jsx` `frontend/src/App.jsx` | A refresh keeps you logged in. A logged-out user is sent away from `/me/*` |
-| [ ] | 42 | `feat: add Login and Register pages` | `frontend/src/pages/Login.jsx` `frontend/src/pages/Register.jsx` | Register (pick at least 3 genres) logs you in and lands on Home |
+| [x] | 40 | `feat: add apiFetch() for every API call` | `frontend/src/api/client.js` | Adds the token. Throws on errors. On 401, clears the token and goes to `/login`. **Every page waits on this — do it first** |
+| [x] | 41 | `feat: add AuthContext and protected routes` | `frontend/src/context/AuthContext.jsx` `frontend/src/App.jsx` `frontend/src/components/NavBar.jsx` `frontend/src/styles/global.css` | A refresh keeps you logged in. A logged-out user is sent away from `/me/*` |
+| [x] | 42 | `feat: add Login and Register pages` | `frontend/src/pages/Login.jsx` `frontend/src/pages/Register.jsx` `frontend/src/context/AuthContext.jsx` `frontend/src/styles/global.css` `frontend/src/styles/tokens.css` | Register (pick at least 3 genres) logs you in and lands on Home |
 
 ---
 

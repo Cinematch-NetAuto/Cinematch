@@ -1,8 +1,9 @@
 // The app's top component: which page shows at which address.
-// Every page sits inside the Layout (nav bar and footer). Step 41 keeps
-// logged-out visitors away from the /me/... pages.
+// Every page sits inside the Layout (nav bar and footer). The /me/... pages
+// sit inside RequireAuth: logged-out visitors are sent to /login.
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout.jsx'
+import { AuthProvider, RequireAuth } from './context/AuthContext.jsx'
 import Discover from './pages/Discover.jsx'
 import Home from './pages/Home.jsx'
 import Library from './pages/Library.jsx'
@@ -28,20 +29,24 @@ function NotFound() {
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/discover" element={<Discover />} />
-          <Route path="/movie/:id" element={<MovieDetail />} />
-          <Route path="/me/recommendations" element={<Recommendations />} />
-          <Route path="/me/library" element={<Library />} />
-          <Route path="/me/preferences" element={<Preferences />} />
-          <Route path="*" element={<NotFound />} />
-        </Route>
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/search" element={<Search />} />
+            <Route path="/discover" element={<Discover />} />
+            <Route path="/movie/:id" element={<MovieDetail />} />
+            <Route element={<RequireAuth />}>
+              <Route path="/me/recommendations" element={<Recommendations />} />
+              <Route path="/me/library" element={<Library />} />
+              <Route path="/me/preferences" element={<Preferences />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   )
 }
