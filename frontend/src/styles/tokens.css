@@ -62,6 +62,7 @@
   --max-width: 1200px;
   --gutter: var(--s5);
   --poster-min: 160px;           /* the narrowest a poster column may be */
+  --form-width: 560px;           /* log in and sign up forms */
 }
 
 /* Phones: a smaller side margin. */

@@ -287,3 +287,85 @@ img {
 .state .button {
   margin-top: var(--s2);
 }
+
+/* ---- Forms: Log in and Sign up ---- */
+
+.form-page {
+  max-width: var(--form-width);
+}
+
+.form {
+  display: grid;
+  gap: var(--s5);
+  margin-bottom: var(--s5);
+}
+
+.field {
+  display: grid;
+  gap: var(--s1);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.field-label {
+  padding: 0;
+  font-size: var(--fs-caption);
+  font-weight: 700;
+}
+
+.field-hint {
+  margin: 0;
+  font-size: var(--fs-caption);
+  color: var(--programme);
+}
+
+.field input {
+  padding: var(--s2) var(--s3);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-control);
+  background: var(--dusk);
+}
+
+.field input[aria-invalid='true'] {
+  border-color: var(--exit-sign);
+}
+
+.field-error,
+.form-error {
+  margin: 0;
+  font-size: var(--fs-caption);
+  color: var(--exit-sign);
+}
+
+.form .button {
+  justify-self: start;
+}
+
+/* Tiles: the film picker's toggle buttons. A chosen tile is a lit bulb. */
+.tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  margin: var(--s2) 0;
+}
+
+.tile {
+  padding: var(--s2) var(--s4);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-control);
+  background: var(--gradient-panel);
+  font-size: var(--fs-caption);
+  cursor: pointer;
+}
+
+.tile:hover {
+  border-color: var(--programme);
+}
+
+.tile[aria-pressed='true'] {
+  border-color: var(--marquee);
+  background: var(--gradient-bulb);
+  color: var(--night);
+  font-weight: 700;
+}

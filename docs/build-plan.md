@@ -273,7 +273,7 @@ each on their own branch. **After this phase `pytest -q` passes**, so the
 |---|---|---|---|---|
 | [x] | 40 | `feat: add apiFetch() for every API call` | `frontend/src/api/client.js` | Adds the token. Throws on errors. On 401, clears the token and goes to `/login`. **Every page waits on this — do it first** |
 | [x] | 41 | `feat: add AuthContext and protected routes` | `frontend/src/context/AuthContext.jsx` `frontend/src/App.jsx` `frontend/src/components/NavBar.jsx` `frontend/src/styles/global.css` | A refresh keeps you logged in. A logged-out user is sent away from `/me/*` |
-| [ ] | 42 | `feat: add Login and Register pages` | `frontend/src/pages/Login.jsx` `frontend/src/pages/Register.jsx` | Register (pick at least 3 genres) logs you in and lands on Home |
+| [x] | 42 | `feat: add Login and Register pages` | `frontend/src/pages/Login.jsx` `frontend/src/pages/Register.jsx` `frontend/src/context/AuthContext.jsx` `frontend/src/styles/global.css` `frontend/src/styles/tokens.css` | Register (pick at least 3 genres) logs you in and lands on Home |
 
 ---
 

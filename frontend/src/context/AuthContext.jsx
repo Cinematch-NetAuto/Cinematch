@@ -1,6 +1,6 @@
 // Who is logged in, for the whole app.
 //
-//   const { user, checking, login, logout } = useAuth()
+//   const { user, checking, login, register, logout } = useAuth()
 //
 // The login token lives in the browser (see api/client.js), so a refresh keeps
 // you logged in: on start, if a token is saved, we ask the backend who it
@@ -44,12 +44,28 @@ export function AuthProvider({ children }) {
     return me
   }, [])
 
+  // Create the account, then log in with the same details.
+  const register = useCallback(
+    async ({ displayName, email, password, genreIds }) => {
+      await apiFetch('/auth/register', {
+        method: 'POST',
+        body: { display_name: displayName, email, password, genre_ids: genreIds },
+        auth: false,
+      })
+      return login(email, password)
+    },
+    [login],
+  )
+
   const logout = useCallback(() => {
     clearToken()
     setUser(null)
   }, [])
 
-  const value = useMemo(() => ({ user, checking, login, logout }), [user, checking, login, logout])
+  const value = useMemo(
+    () => ({ user, checking, login, register, logout }),
+    [user, checking, login, register, logout],
+  )
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
