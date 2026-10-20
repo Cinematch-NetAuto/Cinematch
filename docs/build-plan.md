@@ -284,7 +284,7 @@ each on their own branch. **After this phase `pytest -q` passes**, so the
 | ✓ | # | Commit message | Files | Done when |
 |---|---|---|---|---|
 | [x] | 43 | `feat: add MovieCard and MovieGrid` | `frontend/src/components/MovieCard.jsx` `frontend/src/components/MovieGrid.jsx` `frontend/src/styles/global.css` `docs/design.md` | Poster, title, year, rating, link to detail. A film with **no poster** shows a placeholder |
-| [ ] | 44 | `feat: add Search page` | `frontend/src/pages/Search.jsx` | Typing (300 ms pause) shows posters. Loading, empty and error states all show |
+| [x] | 44 | `feat: add Search page` | `frontend/src/pages/Search.jsx` `frontend/src/styles/global.css` | Typing (300 ms pause) shows posters. Loading, empty and error states all show |
 | [ ] | 45 | `feat: add FilterPanel and Paginator` | `frontend/src/components/FilterPanel.jsx` `frontend/src/components/Paginator.jsx` | Filters are written into the URL. "Page N of M" with a 10/20 toggle |
 | [ ] | 46 | `feat: add Discover page` | `frontend/src/pages/Discover.jsx` | Every filter works in the browser. A refresh keeps them |
 | [ ] | 47 | `feat: add Home page` | `frontend/src/pages/Home.jsx` | Popular films for everyone, plus a "For you" row when logged in |

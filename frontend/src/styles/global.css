@@ -262,6 +262,17 @@ img {
   cursor: not-allowed;
 }
 
+/* ---- Search page ---- */
+
+.search-field {
+  max-width: var(--form-width);
+  margin-bottom: var(--s5);
+}
+
+.search-hint {
+  color: var(--programme);
+}
+
 /* ---- Poster cards (MovieCard.jsx, MovieGrid.jsx) ---- */
 
 .movie-grid {
