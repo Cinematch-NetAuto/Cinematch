@@ -7,7 +7,8 @@ Three small functions turn a film's genres and ratings into one score from
 2. about 60 well-rated candidates in those genres, from TMDB (cached);
 3. drop films the user watched or rated, and films under their minimum rating;
 4. score each film, keep the best 20;
-5. give each a reason that names a real liked film or a real genre.
+5. give each a reason that names a real liked film or a real genre; liked
+   films that fit equally well take turns, so one film does not name them all.
 """
 
 from collections import Counter
@@ -99,20 +100,47 @@ def reason_for(
     liked: list[tuple[str, set[int]]],
     favourites: list[int],
     genre_names: dict[int, str],
+    used: Counter | None = None,
 ) -> str:
-    """One sentence that names a real liked film, or else a real genre."""
+    """One sentence that names a real liked film, or else a real genre.
+
+    The liked film that shares the most genres with this film is named. When
+    several share the same number, the one named least often so far wins, then
+    the most recent like. `used` counts how often each liked film has been
+    named in this list, and this function adds the film it names.
+    """
+    used = Counter() if used is None else used
     film_genres = set(genre_ids)
-    best_title, best_shared = None, 0
-    for title, liked_genres in liked:  # most recent like wins a tie
+    best_title, best_rank = None, None
+    for title, liked_genres in liked:  # most recent first, so it wins a full tie
         shared = len(film_genres & liked_genres)
-        if shared > best_shared:
-            best_title, best_shared = title, shared
+        rank = (shared, -used[title])
+        if shared and (best_rank is None or rank > best_rank):
+            best_title, best_rank = title, rank
     if best_title:
+        used[best_title] += 1
         return f"Because you liked {best_title}"
     for genre_id in favourites + list(genre_ids):
         if genre_id in film_genres and genre_id in genre_names:
             return f"Because you like {genre_names[genre_id]}"
     return "Highly rated by TMDB viewers"
+
+
+def give_reasons(
+    picks: list[dict],
+    liked: list[tuple[str, set[int]]],
+    favourites: list[int],
+    genre_names: dict[int, str],
+) -> None:
+    """Add a "reason" to each pick, in list order (best pick first).
+
+    One counter covers the whole list, so liked films that fit equally well
+    take turns: three liked animated films each name some of the tickets,
+    instead of the newest like naming all of them.
+    """
+    used: Counter = Counter()
+    for pick in picks:
+        pick["reason"] = reason_for(pick["genre_ids"], liked, favourites, genre_names, used)
 
 
 def recommend(db: Session, user_id: int) -> list[dict]:
@@ -153,7 +181,8 @@ def recommend(db: Session, user_id: int) -> list[dict]:
         score = score_movie(
             card["genre_ids"], card["vote_average"] or 0.0, card["vote_count"] or 0, favourites
         )
-        reason = reason_for(card["genre_ids"], liked, favourites, genre_names)
-        picks.append({**card, "score": round(score, 3), "reason": reason})
+        picks.append({**card, "score": round(score, 3)})
     picks.sort(key=lambda pick: pick["score"], reverse=True)
-    return picks[:RESULTS]
+    picks = picks[:RESULTS]
+    give_reasons(picks, liked, favourites, genre_names)  # after the cut: turns over the 20 shown
+    return picks
