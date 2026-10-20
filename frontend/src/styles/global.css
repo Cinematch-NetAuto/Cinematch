@@ -273,6 +273,77 @@ img {
   color: var(--programme);
 }
 
+/* ---- The film picker (FilterPanel.jsx) ---- */
+
+.filter-panel {
+  display: grid;
+  gap: var(--s5);
+  margin-bottom: var(--s6);
+}
+
+.field select {
+  max-width: var(--form-width);
+  padding: var(--s2) var(--s3);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-control);
+  background: var(--dusk);
+}
+
+.more-filters summary {
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  color: var(--marquee);
+  cursor: pointer;
+}
+
+.more-filters-body {
+  display: grid;
+  gap: var(--s4);
+  margin-top: var(--s3);
+}
+
+.filter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s3);
+  padding-top: var(--s4);
+  border-top: 1px solid var(--hairline);
+}
+
+.filter-summary {
+  flex: 1 1 100%;
+  margin: 0;
+  color: var(--programme);
+}
+
+/* ---- Page control (Paginator.jsx) ---- */
+
+.paginator {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s3) var(--s4);
+  margin-top: var(--s6);
+}
+
+.paginator-where {
+  font-size: var(--fs-caption);
+}
+
+.paginator-size {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  margin-left: auto;
+  font-size: var(--fs-caption);
+  color: var(--programme);
+}
+
+.paginator-size .tiles {
+  margin: 0;
+}
+
 /* ---- Poster cards (MovieCard.jsx, MovieGrid.jsx) ---- */
 
 .movie-grid {
