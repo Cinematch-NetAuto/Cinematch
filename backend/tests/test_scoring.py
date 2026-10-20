@@ -6,6 +6,8 @@ Drama, Sci-Fi) and Forrest Gump (Comedy, Drama). The test user "Tester"
 picked Action, Drama and Sci-Fi at sign-up.
 """
 
+from collections import Counter
+
 import pytest
 
 from app import tmdb
@@ -13,6 +15,8 @@ from app.models import UserPreferences
 from app.services.recommend import (
     SITE_AVERAGE,
     genre_match,
+    give_reasons,
+    reason_for,
     score_movie,
     weighted_rating,
 )
@@ -79,6 +83,42 @@ def test_quality_alone_is_worth_30_percent():
 def test_score_stays_between_0_and_1(genre_ids, vote_average, vote_count):
     score = score_movie(genre_ids, vote_average, vote_count, liked_genre_ids=[SCI_FI])
     assert 0.0 <= score <= 1.0
+
+
+# --- Reasons: which liked film a ticket names --------------------------------
+
+ANIMATION, COMEDY, FAMILY, ADVENTURE = 16, 35, 10751, 12
+LIKED_CARTOONS = [  # most recent like first; Up and Toy Story have the same 4 genres
+    ("Up", {ANIMATION, COMEDY, FAMILY, ADVENTURE}),
+    ("Finding Nemo", {ANIMATION, FAMILY}),
+    ("Toy Story", {ANIMATION, ADVENTURE, FAMILY, COMEDY}),
+]
+
+
+def test_equally_good_liked_films_take_turns():
+    # All three liked films share Animation and Family with every pick. Before
+    # the fix, all six tickets said "Because you liked Up".
+    picks: list[dict] = [{"genre_ids": [ANIMATION, FAMILY]} for _ in range(6)]
+    give_reasons(picks, LIKED_CARTOONS, [], {})
+    assert Counter(pick["reason"] for pick in picks) == {
+        "Because you liked Up": 2,
+        "Because you liked Finding Nemo": 2,
+        "Because you liked Toy Story": 2,
+    }
+
+
+def test_more_shared_genres_beats_taking_turns():
+    # Up and Toy Story share all 3 genres; Finding Nemo shares only 2, so it is never named.
+    picks: list[dict] = [{"genre_ids": [ANIMATION, FAMILY, ADVENTURE]} for _ in range(4)]
+    give_reasons(picks, LIKED_CARTOONS, [], {})
+    assert {pick["reason"] for pick in picks} == {
+        "Because you liked Up",
+        "Because you liked Toy Story",
+    }
+
+
+def test_a_full_tie_goes_to_the_most_recent_like():
+    assert reason_for([ANIMATION, FAMILY], LIKED_CARTOONS, [], {}) == "Because you liked Up"
 
 
 # --- The pipeline, through GET /api/me/recommendations ----------------------
