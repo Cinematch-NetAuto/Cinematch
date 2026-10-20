@@ -343,7 +343,7 @@ tests, docs and demo practice.
 
 | ✓ | # | Owner | Commit message | Files | Done when |
 |---|---|---|---|---|---|
-| [ ] | 55 | Dev 3 | `docs: add manual test checklist` | `docs/manual-tests.md` | 15 or more click-through steps that someone else can follow |
+| [x] | 55 | Dev 3 | `docs: add manual test checklist` | `docs/manual-tests.md` | 15 or more click-through steps that someone else can follow |
 | [x] | 56 | Dev 4 | `docs: add recommender evaluation` | `backend/scripts/evaluate.py` (new) `docs/evaluation.md` (new) `backend/tests/test_evaluate.py` (new) | `python -m scripts.evaluate` prints Precision@10: hide some of each demo user's likes, then count how many come back in their top 10. Two numbers, before and after one weight change, and what changed |
 | [x] | 57 | everyone | `docs: complete decisions and glossary` | `docs/decisions.md` `docs/glossary.md` | At least 8 decisions, each with the rejected option. One of them is why OAuth ("log in with Google") was left out. Every term someone asked about |
 | [ ] | 58 | everyone | *(no commit — AI-use notes)* | — | Everyone's AI-use notes are complete: tool, version, prompt and what was kept |
