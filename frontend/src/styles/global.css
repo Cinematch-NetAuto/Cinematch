@@ -445,6 +445,60 @@ img {
   text-decoration: underline;
 }
 
+/* ---- Recommendations (Recommendations.jsx, ReasonChip.jsx) ---- */
+
+.recommendation {
+  display: grid;
+  gap: var(--s2);
+  align-content: start;
+}
+
+/* The reason ticket: a dusk panel with a half-circle notch cut from each side,
+ * so the night shows through. No outline and no shadow. In a mask only the
+ * opacity counts, so the Night in it is just "solid". */
+.reason-ticket {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  margin: 0;
+  background: var(--gradient-panel);
+  mask:
+    radial-gradient(circle at 0 50%, transparent var(--notch), var(--night) calc(var(--notch) + 0.5px))
+      left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 50%, transparent var(--notch), var(--night) calc(var(--notch) + 0.5px))
+      right / 51% 100% no-repeat;
+}
+
+.reason-text {
+  display: grid;
+  gap: var(--s1);
+  min-width: 0;
+  padding: var(--s2) var(--s3) var(--s2) var(--s4); /* the left side clears the notch */
+  font-size: var(--fs-caption);
+  overflow-wrap: anywhere;
+}
+
+.reason {
+  font-weight: 700;
+  color: var(--marquee);
+}
+
+.reason-genres {
+  color: var(--programme);
+}
+
+/* The stub: the rating, past a dashed tear line. */
+.reason-stub {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--s4) 0 var(--s3); /* the right side clears the notch */
+  border-left: 2px dashed var(--tear-line);
+  font-family: var(--font-display);
+  font-size: var(--fs-card);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tracking-display);
+  color: var(--screen);
+}
+
 /* ---- Search page ---- */
 
 .search-field {
