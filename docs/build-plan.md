@@ -269,7 +269,7 @@ each on their own branch. **After this phase `pytest -q` passes**, so the
 
 | ✓ | # | Commit message | Files | Done when |
 |---|---|---|---|---|
-| [ ] | 40 | `feat: add apiFetch() for every API call` | `frontend/src/api/client.js` | Adds the token. Throws on errors. On 401, clears the token and goes to `/login`. **Every page waits on this — do it first** |
+| [x] | 40 | `feat: add apiFetch() for every API call` | `frontend/src/api/client.js` | Adds the token. Throws on errors. On 401, clears the token and goes to `/login`. **Every page waits on this — do it first** |
 | [ ] | 41 | `feat: add AuthContext and protected routes` | `frontend/src/context/AuthContext.jsx` `frontend/src/App.jsx` | A refresh keeps you logged in. A logged-out user is sent away from `/me/*` |
 | [ ] | 42 | `feat: add Login and Register pages` | `frontend/src/pages/Login.jsx` `frontend/src/pages/Register.jsx` | Register (pick at least 3 genres) logs you in and lands on Home |
 
