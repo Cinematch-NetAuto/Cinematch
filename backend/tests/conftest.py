@@ -85,7 +85,14 @@ class FakeTmdb:
             raise tmdb.TmdbNotFound("TMDB answered 404")
         genres = [g for g in FAKE_GENRES if g["id"] in movie["genre_ids"]]
         cast = [{"name": "An Actor", "character": "Someone", "profile_path": None}]
-        return {**movie, "genres": genres, "runtime": 120, "tagline": "", "credits": {"cast": cast}}
+        return {
+            **movie,
+            "backdrop_path": f"/{tmdb_id}-wide.jpg",
+            "genres": genres,
+            "runtime": 120,
+            "tagline": "",
+            "credits": {"cast": cast},
+        }
 
     def genres(self) -> list[dict]:
         self.calls.append(("genres",))

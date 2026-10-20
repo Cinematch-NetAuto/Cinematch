@@ -59,8 +59,9 @@ class CastMember(BaseModel):
 
 
 class MovieDetail(MovieCard):
-    """A film's own page: the card plus runtime, tagline, genre names and cast."""
+    """A film's own page: the card plus backdrop, runtime, tagline, genre names and cast."""
 
+    backdrop_url: str | None  # the wide still at the top of the film's page
     runtime: int | None  # minutes
     tagline: str
     genres: list[GenreOut]

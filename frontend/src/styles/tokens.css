@@ -63,6 +63,8 @@
   --gutter: var(--s5);
   --poster-min: 160px;           /* the narrowest a poster column may be */
   --form-width: 560px;           /* log in and sign up forms */
+  --film-poster: 220px;          /* the poster on a film's page */
+  --backdrop-height: 380px;      /* the wide still atop a film's page */
 }
 
 /* Phones: a smaller side margin. */

@@ -289,6 +289,105 @@ img {
   gap: var(--s2) var(--s4);
 }
 
+/* ---- A film's page (MovieDetail.jsx) ---- */
+
+.film-hero {
+  position: relative;
+  margin-bottom: var(--s5);
+}
+
+/* The wide still, fading into Night at the bottom. */
+.film-backdrop {
+  position: absolute;
+  inset: 0 0 auto 0;
+  width: 100%;
+  height: var(--backdrop-height);
+  object-fit: cover;
+  opacity: 0.5;
+  mask-image: linear-gradient(to bottom, var(--night) 30%, transparent);
+}
+
+.film-hero-inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, var(--film-poster)) minmax(0, 1fr);
+  align-items: end;
+  gap: var(--s5);
+  padding-top: var(--s7);
+}
+
+.film-poster {
+  border: 1px solid var(--hairline);
+}
+
+.film-title {
+  margin-bottom: var(--s2);
+  font-size: var(--fs-hero);
+}
+
+.film-tagline {
+  font-size: var(--fs-card);
+}
+
+.film-facts {
+  margin-bottom: var(--s1);
+  color: var(--programme);
+}
+
+.film-facts span + span::before {
+  content: '';
+  margin-left: var(--s2);
+}
+
+.film-actions {
+  margin-bottom: var(--s6);
+}
+
+.choice-dislike[aria-pressed='true'] {
+  border-color: var(--exit-sign);
+  background: var(--gradient-panel);
+  color: var(--exit-sign);
+}
+
+.cast {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--poster-min), 1fr));
+  gap: var(--s4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cast li {
+  display: grid;
+  gap: var(--s1);
+  font-size: var(--fs-caption);
+}
+
+.cast-photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: var(--radius-poster);
+  background: var(--gradient-panel);
+}
+
+.cast-role {
+  color: var(--programme);
+}
+
+/* Phones: the poster sits above the title instead of beside it. */
+@media (max-width: 600px) {
+  .film-hero-inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .film-hero .film-poster {
+    width: 60%;
+  }
+}
+
 /* ---- Search page ---- */
 
 .search-field {
