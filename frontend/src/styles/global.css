@@ -83,6 +83,24 @@ textarea {
   color: inherit;
 }
 
+/* The browser's grey placeholder is under 4.5 : 1 on a Dusk input (3.65 : 1). */
+::placeholder {
+  color: var(--programme);
+  opacity: 1;
+}
+
+/* The design has no motion (docs/design.md, "Motion: none"). This keeps it that
+ * way if a later change adds some, for people who ask for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 img {
   display: block;
   max-width: 100%;
@@ -303,7 +321,9 @@ img {
   width: 100%;
   height: var(--backdrop-height);
   object-fit: cover;
-  opacity: 0.5;
+  /* Text sits on this image. At 0.2, even a pure white pixel leaves Programme
+   * text at 4.55 : 1; at the old 0.5 it was 1.48 : 1. */
+  opacity: 0.2;
   mask-image: linear-gradient(to bottom, var(--night) 30%, transparent);
 }
 
