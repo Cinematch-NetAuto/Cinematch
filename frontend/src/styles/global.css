@@ -262,6 +262,33 @@ img {
   cursor: not-allowed;
 }
 
+/* ---- Home page ---- */
+
+.home-welcome {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s3) var(--s5);
+  margin-bottom: var(--s6);
+}
+
+.home-welcome p {
+  margin: 0;
+  color: var(--programme);
+}
+
+.home-section {
+  margin-bottom: var(--s7);
+}
+
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s2) var(--s4);
+}
+
 /* ---- Search page ---- */
 
 .search-field {
