@@ -2,8 +2,10 @@
 // to the other pages. The link to the page you are on is gold.
 //
 // A film's page has no link here: you reach it from a poster (step 43).
-// Step 41 swaps "Log in" and "Sign up" for "Log out" once you are logged in.
+// Logged out: "Log in" and "Sign up". Logged in: your name, "Preferences" and
+// "Log out".
 import { Link, NavLink } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext.jsx'
 
 const BROWSE = [
   { to: '/search', label: 'Search' },
@@ -12,36 +14,57 @@ const BROWSE = [
   { to: '/me/library', label: 'Library' },
 ]
 
-const ACCOUNT = [
-  { to: '/me/preferences', label: 'Preferences' },
-  { to: '/login', label: 'Log in' },
-  { to: '/register', label: 'Sign up' },
-]
-
-function Links({ items, className }) {
+function NavItem({ to, label }) {
   return (
-    <ul className={className}>
-      {items.map(({ to, label }) => (
-        <li key={to}>
-          {/* NavLink adds class "active" and aria-current="page" on the current page */}
-          <NavLink to={to} className="nav-link">
-            {label}
-          </NavLink>
-        </li>
-      ))}
-    </ul>
+    <li>
+      {/* NavLink adds class "active" and aria-current="page" on the current page */}
+      <NavLink to={to} className="nav-link">
+        {label}
+      </NavLink>
+    </li>
   )
 }
 
 export default function NavBar() {
+  const { user, logout } = useAuth()
+
+  // A full reload at Home. A router move would lose the race: the /me/... page
+  // you are on would see "logged out" first and send you to /login instead.
+  // The reload also clears anything of yours still held in the page.
+  function handleLogout() {
+    logout()
+    window.location.assign('/')
+  }
+
   return (
     <header className="nav">
       <nav className="nav-inner" aria-label="Main">
         <Link to="/" className="nav-name">
           CineMatch
         </Link>
-        <Links items={BROWSE} className="nav-links" />
-        <Links items={ACCOUNT} className="nav-links nav-account" />
+        <ul className="nav-links">
+          {BROWSE.map((item) => (
+            <NavItem key={item.to} {...item} />
+          ))}
+        </ul>
+        <ul className="nav-links nav-account">
+          {user ? (
+            <>
+              <li className="nav-user">{user.display_name}</li>
+              <NavItem to="/me/preferences" label="Preferences" />
+              <li>
+                <button type="button" className="nav-link nav-button" onClick={handleLogout}>
+                  Log out
+                </button>
+              </li>
+            </>
+          ) : (
+            <>
+              <NavItem to="/login" label="Log in" />
+              <NavItem to="/register" label="Sign up" />
+            </>
+          )}
+        </ul>
       </nav>
     </header>
   )

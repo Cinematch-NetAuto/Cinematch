@@ -184,6 +184,19 @@ img {
   color: var(--marquee);
 }
 
+/* "Log out" is a button that looks like the nav links. */
+.nav-button {
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.nav-user {
+  padding: var(--s1) 0;
+  font-size: var(--fs-caption);
+  color: var(--screen);
+}
+
 .page-footer {
   width: 100%;
   max-width: var(--max-width);
