@@ -1,5 +1,7 @@
 """Tests for password hashing and login tokens."""
 
+from datetime import UTC, datetime, timedelta
+
 import jwt
 import pytest
 
@@ -96,6 +98,27 @@ def test_expired_token_fails(monkeypatch):
     token = create_token(1)
     with pytest.raises(InvalidToken):
         read_token(token)
+
+
+def token_issued_in(seconds: int) -> str:
+    """A valid token whose "issued at" time is this many seconds from now."""
+    issued = datetime.now(UTC) + timedelta(seconds=seconds)
+    claims = {"sub": "1", "iat": issued, "exp": issued + timedelta(hours=1)}
+    return jwt.encode(claims, TEST_SECRET, algorithm="HS256")
+
+
+@pytest.mark.usefixtures("secret")
+def test_token_survives_a_small_clock_step_back():
+    # Inside Docker on Windows the clock was seen stepping back 3.8 s. A token made
+    # just before such a step looks issued a few seconds in the future. Without
+    # leeway it was refused, and about 1 test run in 30 failed with a 401.
+    assert read_token(token_issued_in(5)) == 1
+
+
+@pytest.mark.usefixtures("secret")
+def test_token_issued_far_in_the_future_fails():
+    with pytest.raises(InvalidToken):
+        read_token(token_issued_in(300))
 
 
 @pytest.mark.usefixtures("secret")

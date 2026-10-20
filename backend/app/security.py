@@ -18,6 +18,11 @@ from app.config import JWT_ALGORITHM, JWT_SECRET, TOKEN_HOURS
 BCRYPT_ROUNDS = 12  # cost factor: each +1 doubles the time to hash, and to guess
 MAX_PASSWORD_BYTES = 72  # bcrypt only reads the first 72 bytes of a password
 MIN_SECRET_LENGTH = 32  # a shorter secret can be guessed offline from one token
+# Clocks get corrected: inside Docker on Windows one stepped back 3.8 s. Without
+# leeway, a token made just before such a step looks "issued in the future" and is
+# refused, so a freshly logged-in user gets a 401. 30 s covers that and stays tiny
+# next to the token's lifetime of TOKEN_HOURS.
+CLOCK_LEEWAY = timedelta(seconds=30)
 
 
 class InvalidToken(Exception):
@@ -68,7 +73,11 @@ def read_token(token: str) -> int:
     """
     try:
         payload = jwt.decode(
-            token, _secret(), algorithms=[JWT_ALGORITHM], options={"require": ["exp", "sub"]}
+            token,
+            _secret(),
+            algorithms=[JWT_ALGORITHM],
+            leeway=CLOCK_LEEWAY,
+            options={"require": ["exp", "sub"]},
         )
         return int(payload["sub"])
     except (jwt.PyJWTError, ValueError) as error:
