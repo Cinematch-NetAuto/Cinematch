@@ -262,6 +262,66 @@ img {
   cursor: not-allowed;
 }
 
+/* ---- Poster cards (MovieCard.jsx, MovieGrid.jsx) ---- */
+
+.movie-grid {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.movie-card {
+  display: grid;
+  gap: var(--s1);
+  color: var(--screen);
+}
+
+.movie-card:hover {
+  text-decoration: none;
+}
+
+.poster {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: var(--radius-poster);
+  background: var(--gradient-panel); /* shows while the image loads */
+}
+
+/* No poster: a dusk panel with the title, set like a poster title. */
+.poster-empty {
+  display: flex;
+  align-items: flex-end;
+  padding: var(--s3);
+  border: 1px solid var(--hairline);
+  font-family: var(--font-display);
+  font-size: var(--fs-card);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+  color: var(--programme);
+  overflow: hidden;
+}
+
+.movie-title {
+  margin-top: var(--s1);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.movie-card:hover .movie-title {
+  color: var(--marquee);
+}
+
+.movie-meta {
+  display: flex;
+  gap: var(--s3);
+  font-size: var(--fs-caption);
+  color: var(--programme);
+}
+
 /* ---- Loading, empty and error states (States.jsx) ---- */
 
 .poster-block {
