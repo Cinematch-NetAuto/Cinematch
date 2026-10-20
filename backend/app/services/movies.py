@@ -26,6 +26,7 @@ TMDB_PAGE_SIZE = 20  # TMDB always returns exactly 20 results per page
 TMDB_MAX_PAGE = 500  # TMDB refuses any page number above 500
 POSTER_SIZE = "w342"  # TMDB image width that suits a poster grid
 PROFILE_SIZE = "w185"  # TMDB image width for cast photos
+BACKDROP_SIZE = "w1280"  # TMDB image width for the wide still atop a film's page
 CAST_SIZE = 10  # actors shown on a film's page
 MIN_VOTES = 200  # rating filters ignore films with fewer votes, or 1-vote films win
 
@@ -218,8 +219,10 @@ def movie_detail(db: Session, tmdb_id: int) -> dict:
     save_movie(db, data)
     genres = [{"id": g["id"], "name": g["name"]} for g in data.get("genres", [])]
     cast = data.get("credits", {}).get("cast", [])[:CAST_SIZE]
+    backdrop = data.get("backdrop_path")
     return {
         **to_card({**data, "genre_ids": [g["id"] for g in genres]}),
+        "backdrop_url": f"{IMAGE_BASE}/{BACKDROP_SIZE}{backdrop}" if backdrop else None,
         "runtime": data.get("runtime"),
         "tagline": data.get("tagline") or "",
         "genres": genres,

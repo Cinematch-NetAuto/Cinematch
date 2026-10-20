@@ -4,6 +4,8 @@
 // `film` is a MovieCard from the backend: { tmdb_id, title, release_date,
 // poster_url, vote_average, vote_count, ... }. Films without a poster show a
 // dusk panel with the title on it; films with no votes say so instead of "0.0".
+// `showRating={false}` leaves the rating out, for pages that show it elsewhere
+// (the reason ticket on Recommendations).
 import { Link } from 'react-router-dom'
 
 export function yearOf(film) {
@@ -14,7 +16,7 @@ export function ratingOf(film) {
   return film.vote_count > 0 ? film.vote_average.toFixed(1) : null
 }
 
-export default function MovieCard({ film }) {
+export default function MovieCard({ film, showRating = true }) {
   const rating = ratingOf(film)
   return (
     <Link to={`/movie/${film.tmdb_id}`} className="movie-card">
@@ -33,7 +35,7 @@ export default function MovieCard({ film }) {
       </span>{' '}
       <span className="movie-meta">
         <span>{yearOf(film)}</span>{' '}
-        {rating ? (
+        {!showRating ? null : rating ? (
           <span>
             <span className="visually-hidden">rated </span>
             {rating}

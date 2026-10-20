@@ -297,9 +297,9 @@ each on their own branch. **After this phase `pytest -q` passes**, so the
 
 | ✓ | # | Commit message | Files | Done when |
 |---|---|---|---|---|
-| [ ] | 48 | `feat: add MovieDetail page with like, dislike and watched` | `frontend/src/pages/MovieDetail.jsx` | Poster, overview, cast. The buttons still show the right state after a refresh |
-| [ ] | 49 | `feat: add Library page` | `frontend/src/pages/Library.jsx` | Liked, Disliked and History tabs. A like can be removed |
-| [ ] | 50 | `feat: add Recommendations page with reasons` | `frontend/src/components/ReasonChip.jsx` `frontend/src/pages/Recommendations.jsx` | **Like 3 films → refresh → the list changes** |
+| [x] | 48 | `feat: add MovieDetail page with like, dislike and watched` | `frontend/src/pages/MovieDetail.jsx` `frontend/src/styles/global.css` `frontend/src/styles/tokens.css`; the backdrop: `backend/app/services/movies.py` `backend/app/schemas.py` `backend/tests/conftest.py` `backend/tests/test_api_movies.py` (new) | Poster, overview, cast. The buttons still show the right state after a refresh |
+| [x] | 49 | `feat: add Library page` | `frontend/src/pages/Library.jsx` `frontend/src/styles/global.css` | Liked, Disliked and History tabs (the History tab is labelled "Watched"). A like can be removed |
+| [x] | 50 | `feat: add Recommendations page with reasons` | `frontend/src/components/ReasonChip.jsx` `frontend/src/pages/Recommendations.jsx` `frontend/src/components/MovieCard.jsx` `frontend/src/styles/global.css` | **Like 3 films → refresh → the list changes** |
 
 ---
 
