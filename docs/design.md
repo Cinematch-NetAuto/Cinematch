@@ -169,7 +169,9 @@ demo, and the reduced-motion check (step 54) passes by design.
 ## Checks for every screen
 
 - Every control is reachable with Tab and shows the Marquee focus ring.
-- Every poster has alt text: the film title.
+- Every poster has alt text: the film title. On a poster card the title is written
+  under the poster inside the same link, so there the alt text is empty and the
+  title is read once.
 - Every list has its loading, empty and error state (step 38).
 - Pages work at 375 px wide (step 54).
 - The footer TMDB notice is on every page.
