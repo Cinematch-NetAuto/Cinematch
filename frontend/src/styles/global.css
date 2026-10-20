@@ -388,6 +388,63 @@ img {
   }
 }
 
+/* ---- Your library (Library.jsx) ---- */
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s5);
+  margin-bottom: var(--s5);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.tab {
+  margin-bottom: -1px; /* the chosen tab's line sits on the row's line */
+  padding: var(--s2) 0;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: none;
+  color: var(--programme);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tab[aria-selected='true'] {
+  border-bottom-color: var(--marquee);
+  color: var(--screen);
+}
+
+.tab-count {
+  font-weight: 400;
+  color: var(--programme);
+}
+
+.library-item {
+  display: grid;
+  gap: var(--s1);
+  align-content: start;
+}
+
+.library-note {
+  font-size: var(--fs-caption);
+  color: var(--programme);
+}
+
+.library-remove {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: var(--fs-caption);
+  color: var(--exit-sign);
+  cursor: pointer;
+}
+
+.library-remove:hover {
+  text-decoration: underline;
+}
+
 /* ---- Search page ---- */
 
 .search-field {
