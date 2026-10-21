@@ -1,4 +1,4 @@
-"""API tests for likes, dislikes and watch history (the /api/me routes).
+"""API tests for likes, dislikes, watch history and preferences (the /api/me routes).
 
 They use the shared fixtures in conftest.py: the test database, a fake TMDB
 with Inception (27205), Interstellar (157336) and Forrest Gump (13), and a
@@ -20,6 +20,10 @@ def rate(client, headers, tmdb_id, value):
 
 def rating_rows(db):
     return db.scalar(select(func.count()).select_from(Rating))
+
+
+def patch_preferences(client, headers, **changes):
+    return client.patch("/api/me/preferences", json=changes, headers=headers)
 
 
 def test_liking_saves_the_film_first(client, auth_headers, db, fake_tmdb):
@@ -105,10 +109,66 @@ def test_each_user_sees_only_their_own(client, auth_headers):
     assert client.get("/api/me/likes", headers=other_headers).json() == []
 
 
+def test_new_user_has_their_starter_genres(client, auth_headers):
+    answer = client.get("/api/me/preferences", headers=auth_headers)
+    assert answer.status_code == 200
+    assert answer.json() == {
+        "preferred_genres": [18, 28, 878],  # signed up with [28, 18, 878]
+        "year_from": None,
+        "year_to": None,
+        "preferred_region": None,
+        "min_vote_average": 0,
+    }
+
+
+def test_patch_changes_only_what_was_sent(client, auth_headers):
+    answer = patch_preferences(client, auth_headers, preferred_region="kr")
+    assert answer.status_code == 200
+    assert answer.json()["preferred_region"] == "KR"  # saved in capitals
+    answer = patch_preferences(client, auth_headers, min_vote_average=7.5)
+    assert answer.json()["min_vote_average"] == 7.5
+    assert answer.json()["preferred_region"] == "KR"  # left as it was
+    assert answer.json()["preferred_genres"] == [18, 28, 878]
+    assert client.get("/api/me/preferences", headers=auth_headers).json() == answer.json()
+
+
+@pytest.mark.parametrize(
+    "changes",
+    [{"min_vote_average": 11}, {"min_vote_average": None},
+     {"year_from": 2010, "year_to": 2000}, {"preferred_region": "AUS"},
+     {"preferred_genres": [28, 18]}, {"preferred_genres": [28, 18, 28]}],
+)  # fmt: skip
+def test_bad_preferences_are_422(client, auth_headers, changes):
+    assert patch_preferences(client, auth_headers, **changes).status_code == 422
+
+
+def test_unknown_genre_ids_are_422(client, auth_headers):
+    answer = patch_preferences(client, auth_headers, preferred_genres=[1, 2, 3])
+    assert answer.status_code == 422
+    assert "Unknown genre ids" in answer.json()["detail"]
+
+
+def test_year_from_is_checked_against_the_saved_year_to(client, auth_headers):
+    assert patch_preferences(client, auth_headers, year_to=2000).status_code == 200
+    assert patch_preferences(client, auth_headers, year_from=2010).status_code == 422
+
+
+def test_a_higher_minimum_rating_changes_recommendations_at_once(client, auth_headers):
+    def recommended_ids():
+        answer = client.get("/api/me/recommendations", headers=auth_headers)
+        return [film["tmdb_id"] for film in answer.json()]
+
+    assert INCEPTION in recommended_ids()
+    patch_preferences(client, auth_headers, min_vote_average=8.45)  # Inception is 8.4
+    ids = recommended_ids()
+    assert INCEPTION not in ids and INTERSTELLAR in ids
+
+
 @pytest.mark.parametrize(
     "method, path",
     [("get", "/api/me/likes"), ("put", "/api/me/likes"), ("delete", "/api/me/likes"),
-     ("get", "/api/me/history"), ("post", "/api/me/history")],
+     ("get", "/api/me/history"), ("post", "/api/me/history"),
+     ("get", "/api/me/preferences"), ("patch", "/api/me/preferences")],
 )  # fmt: skip
 def test_every_library_route_needs_a_login(client, method, path):
     assert client.request(method, path).status_code == 401
