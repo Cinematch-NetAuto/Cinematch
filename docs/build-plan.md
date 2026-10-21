@@ -327,7 +327,7 @@ each on their own branch. **After this phase `pytest -q` passes**, so the
 
 | ✓ | # | Commit message | Files | Done when |
 |---|---|---|---|---|
-| [ ] | 53 | `feat: add warm_cache script for the offline demo` | `backend/scripts/warm_cache.py` | `python -m scripts.warm_cache` saves about 300 films. **Wi-fi off → search and discover still work** |
+| [x] | 53 | `feat: add warm_cache script for the offline demo` | `backend/scripts/warm_cache.py` | `python -m scripts.warm_cache` saves about 300 films. **Wi-fi off → search and discover still work** |
 | [ ] | 54 | `fix: responsive layout, keyboard focus and reduced motion` | `frontend/src/styles/*.css` and the components that need it | Every page works at 375 px wide. Tab reaches every control, with a visible focus ring. Motion stops when the system asks for reduced motion. Text contrast is at least 4.5:1 |
 
 > **Trap:** posters come from TMDB's image server, so offline they show the placeholder.
