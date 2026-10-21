@@ -25,7 +25,7 @@ then pick a task from [docs/build-plan.md](docs/build-plan.md).
 The **backend is complete** for phases 1–8: films from TMDB (search, filters, film
 pages, with a cache), accounts, likes, dislikes, watch history and personal
 recommendations with reasons. The frontend is not started. The preferences
-endpoints and the language switch come with their screens in phase 13.
+endpoints are done; their screen and the language switch come in phase 13.
 
 | Part | State |
 |---|---|
@@ -38,7 +38,8 @@ endpoints and the language switch come with their screens in phase 13.
 | Backend: recommendations — 20 films, each with a score and a reason | done |
 | Tests — unit tests and API tests on a separate test database | done — 80 tests pass |
 | Jenkins pipeline: install, lint, test on every push | done — `docker compose up -d jenkins`, then http://localhost:8081 |
-| Backend: preferences endpoints, language switch | **not started** — phase 13 |
+| Backend: preferences endpoints — `GET` / `PATCH /api/me/preferences` | done |
+| Backend: language switch | **not started** — phase 13 |
 | Frontend | **not started** — files exist, 0 bytes |
 
 What that means for the setup steps below:

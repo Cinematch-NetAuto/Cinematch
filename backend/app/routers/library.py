@@ -1,8 +1,10 @@
-"""The user's own film lists: likes, dislikes and watch history.
+"""The user's own film lists (likes, dislikes, watch history) and settings.
 
 Every route here needs a login (user: CurrentUser). A film is saved in
 `movies` before it is rated or marked watched, because ratings and history
 point at that table. Films come back as the same cards as search results.
+The settings are the user's row in user_preferences; the recommender reads
+them on every request, so a change shows in the next recommendations.
 """
 
 from datetime import UTC, datetime
@@ -13,8 +15,15 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.deps import CurrentUser, Db
-from app.models import Movie, MovieGenre, Rating, WatchHistory
-from app.schemas import HistoryIn, RatedMovie, RatingIn, WatchedMovie
+from app.models import Movie, MovieGenre, Rating, UserPreferences, WatchHistory
+from app.schemas import (
+    HistoryIn,
+    PreferencesOut,
+    PreferencesUpdate,
+    RatedMovie,
+    RatingIn,
+    WatchedMovie,
+)
 from app.services import movies as movie_service
 from app.tmdb import TmdbError, TmdbNotFound
 
@@ -118,3 +127,34 @@ def add_to_history(body: HistoryIn, user: CurrentUser, db: Db):
     db.commit()
     card = _cards(db, [body.tmdb_id])[body.tmdb_id]
     return {**card, "watched_at": entry.watched_at}
+
+
+def _preferences(db: Session, user_id: int) -> UserPreferences:
+    """The user's one row in user_preferences. Sign-up makes it, so it is always there."""
+    preferences = db.get(UserPreferences, user_id)
+    if preferences is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No preferences saved for this user")
+    return preferences
+
+
+@router.get("/preferences", response_model=PreferencesOut)
+def get_preferences(user: CurrentUser, db: Db):
+    """The user's settings: favourite genres, years, country and minimum rating."""
+    return _preferences(db, user.id)
+
+
+@router.patch("/preferences", response_model=PreferencesOut)
+def update_preferences(body: PreferencesUpdate, user: CurrentUser, db: Db):
+    """Change only the settings that were sent, then return them all."""
+    preferences = _preferences(db, user.id)
+    changes = body.model_dump(exclude_unset=True)  # only the fields that were sent
+    year_from = changes.get("year_from", preferences.year_from)
+    year_to = changes.get("year_to", preferences.year_to)
+    if year_from and year_to and year_from > year_to:  # also against the saved years
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY, "year_from must not be after year_to"
+        )
+    for field, value in changes.items():
+        setattr(preferences, field, value)
+    db.commit()
+    return preferences

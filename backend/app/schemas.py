@@ -22,6 +22,14 @@ def _strip(value: object) -> object:
     return value.strip() if isinstance(value, str) else value
 
 
+def _three_genres(genre_ids: list[int]) -> list[int]:
+    """Keep each genre once, and insist on 3 or more different ones."""
+    unique = sorted(set(genre_ids))
+    if len(unique) < 3:
+        raise ValueError("pick at least 3 different genres")
+    return unique
+
+
 class HealthOut(BaseModel):
     """Answer of GET /health."""
 
@@ -88,15 +96,7 @@ class UserCreate(BaseModel):
 
     _email = field_validator("email", mode="before")(_clean_email)
     _name = field_validator("display_name", mode="before")(_strip)
-
-    @field_validator("genre_ids")
-    @classmethod
-    def at_least_three_genres(cls, genre_ids: list[int]) -> list[int]:
-        """Keep each genre once, and insist on 3 or more different ones."""
-        unique = sorted(set(genre_ids))
-        if len(unique) < 3:
-            raise ValueError("pick at least 3 different genres")
-        return unique
+    _genres = field_validator("genre_ids")(_three_genres)
 
 
 class LoginRequest(BaseModel):
@@ -124,6 +124,41 @@ class UserOut(BaseModel):
     email: str
     display_name: str
     content_language: str
+
+
+class PreferencesOut(BaseModel):
+    """A user's settings. The recommender reads them on every request."""
+
+    model_config = ConfigDict(from_attributes=True)  # can be built from a UserPreferences row
+
+    preferred_genres: list[int]
+    year_from: int | None
+    year_to: int | None
+    preferred_region: str | None  # country code, e.g. "AU"
+    min_vote_average: float
+
+
+class PreferencesUpdate(BaseModel):
+    """Changes to a user's settings. A field that is not sent stays as it is.
+
+    year_from, year_to and preferred_region may be null (no limit).
+    preferred_genres and min_vote_average may not: their default of None only
+    means "not sent", and an explicit null is refused.
+    """
+
+    preferred_genres: list[int] = Field(None, description="At least 3 different genre ids")
+    year_from: int | None = Field(None, ge=1874, le=2100)
+    year_to: int | None = Field(None, ge=1874, le=2100)
+    preferred_region: str | None = Field(None, pattern=r"^[A-Za-z]{2}$")  # e.g. "AU" or "kr"
+    min_vote_average: float = Field(None, ge=0, le=10)
+
+    _genres = field_validator("preferred_genres")(_three_genres)
+
+    @field_validator("preferred_region")
+    @classmethod
+    def capitals(cls, region: str | None) -> str | None:
+        """Save "kr" as "KR", the way TMDB writes country codes."""
+        return region.upper() if region else region
 
 
 class RatingIn(BaseModel):
