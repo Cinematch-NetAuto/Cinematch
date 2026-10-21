@@ -142,6 +142,12 @@ def test_bad_preferences_are_422(client, auth_headers, changes):
     assert patch_preferences(client, auth_headers, **changes).status_code == 422
 
 
+def test_unknown_genre_ids_are_422(client, auth_headers):
+    answer = patch_preferences(client, auth_headers, preferred_genres=[1, 2, 3])
+    assert answer.status_code == 422
+    assert "Unknown genre ids" in answer.json()["detail"]
+
+
 def test_year_from_is_checked_against_the_saved_year_to(client, auth_headers):
     assert patch_preferences(client, auth_headers, year_to=2000).status_code == 200
     assert patch_preferences(client, auth_headers, year_from=2010).status_code == 422

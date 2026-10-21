@@ -148,6 +148,16 @@ def update_preferences(body: PreferencesUpdate, user: CurrentUser, db: Db):
     """Change only the settings that were sent, then return them all."""
     preferences = _preferences(db, user.id)
     changes = body.model_dump(exclude_unset=True)  # only the fields that were sent
+    if "preferred_genres" in changes:  # the same check as sign-up
+        try:
+            known = {genre.id for genre in movie_service.list_genres(db)}
+        except TmdbError as error:
+            raise HTTPException(status.HTTP_502_BAD_GATEWAY, "Genre list unavailable") from error
+        unknown = sorted(set(changes["preferred_genres"]) - known)
+        if unknown:
+            raise HTTPException(
+                status.HTTP_422_UNPROCESSABLE_ENTITY, f"Unknown genre ids: {unknown}"
+            )
     year_from = changes.get("year_from", preferences.year_from)
     year_to = changes.get("year_to", preferences.year_to)
     if year_from and year_to and year_from > year_to:  # also against the saved years
