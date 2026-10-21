@@ -20,27 +20,32 @@ then pick a task from [docs/build-plan.md](docs/build-plan.md).
 
 ---
 
-## Current status — 16 October 2026
+## Current status — 21 October 2026
 
-The **backend is complete** for phases 1–8: films from TMDB (search, filters, film
-pages, with a cache), accounts, likes, dislikes, watch history and personal
-recommendations with reasons. The frontend is not started. The preferences
-endpoints are done; their screen and the language switch come in phase 13.
+The **backend is complete**. It gets films from TMDB with search, filters, film
+pages, and a cache. It also handles accounts, likes, dislikes, watch history, and
+preferences. It gives personal recommendations with reasons. The **frontend works
+end to end** for every screen except the preferences page. That page is just a
+placeholder for now. The preferences page and the language switch will come in
+phase 13.
 
 | Part | State |
 |---|---|
 | Setup files (`.gitignore`, `.env.example`, `docker-compose.yml`, `requirements.txt`, `pyproject.toml`) | done |
-| Documentation (this file, `CONTRIBUTING.md`, `docs/build-plan.md`) | done |
+| Documentation (this file, `CONTRIBUTING.md`, `docs/build-plan.md`, `docs/decisions.md`, `docs/glossary.md`, `docs/evaluation.md`, `docs/manual-tests.md`) | done |
 | Database: the 8 tables (`db/schema.sql`), `scripts/init_db.py`, demo data (`scripts/seed_data.py`) | done |
 | Backend: movies — genres, title search, filters, film page, TMDB cache | done |
 | Backend: accounts — register, login, `GET /api/users/me` | done |
 | Backend: likes, dislikes, watch history | done |
+| Backend: preferences — `GET` / `PATCH /api/me/preferences` | done |
 | Backend: recommendations — 20 films, each with a score and a reason | done |
-| Tests — unit tests and API tests on a separate test database | done — 80 tests pass |
-| Jenkins pipeline: install, lint, test on every push | done — `docker compose up -d jenkins`, then http://localhost:8081 |
-| Backend: preferences endpoints — `GET` / `PATCH /api/me/preferences` | done |
-| Backend: language switch | **not started** — phase 13 |
-| Frontend | **not started** — files exist, 0 bytes |
+| Offline demo: `scripts/warm_cache.py` fills the TMDB cache in advance | done |
+| Tests — unit tests and API tests on a separate test database | done — 109 tests pass |
+| Jenkins pipeline: install, lint, test and frontend build on every push | done — `docker compose up -d jenkins`, then http://localhost:8081 |
+| Frontend: home, sign-up, login, search, discover, film page, library, recommendations | done |
+| Frontend: phone layout, keyboard focus, reduced motion | done |
+| Frontend: preferences page | **not started** — phase 13 |
+| Language switch | **not started** — phase 13 |
 
 What that means for the setup steps below:
 
@@ -49,10 +54,11 @@ What that means for the setup steps below:
 | 1. Clone and configure | yes |
 | 2. Start the database | yes |
 | 3. Start the backend | **yes** — every endpoint so far is on `/docs`. `seed_data` adds 3 demo users: `ava@example.com`, `ben@example.com`, `cleo@example.com`, password `demo-password` |
-| 4. Start the frontend | **not yet** — needs `frontend/package.json` |
+| 4. Start the frontend | **yes** — http://localhost:5173 |
 | Run the tests | **yes** — `pytest -q` in `backend/`; the API tests need the database from step 2 |
 
-The next job is **Phase 9** in [docs/build-plan.md](docs/build-plan.md): the design and the frontend shell.
+The next job is **Phase 13** in [docs/build-plan.md](docs/build-plan.md). First comes the preferences
+page. Then comes the language switch.
 Update this section whenever a row changes. Delete it when every row says yes.
 
 ---
