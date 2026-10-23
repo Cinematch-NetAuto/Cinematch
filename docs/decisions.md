@@ -32,6 +32,7 @@ so write it in your own words, the day you decide.
 - **Chose:** Email and password, with bcrypt password hashes and a JWT login token
 - **Rejected:** "Log in with Google" (OAuth)
 - **Why:** Google login requires a Google Cloud project, a client ID and secret on every developer's laptop, and internet access at every login, whereas the demo must work offline. Email and password cover the app's needs without sending user data to Google.
+- **Replaced by:** D17 (Google sign-in added as an extra way in)
 
 ### D3 — PostgreSQL, not SQLite
 
@@ -130,3 +131,10 @@ so write it in your own words, the day you decide.
 - **Chose:** Taste 0.7, quality 0.3
 - **Rejected:** Taste 0.5, quality 0.5
 - **Why:** The evaluation found 4 of 8 hidden films under both settings (`docs/evaluation.md`). Because the weights only reorder a shortlist of films rated 8.1 to 9.1, improving the shortlist comes next.
+
+### D17 — Add "Sign in with Google" next to email and password
+
+- **Date / who:** 2026-10-23 · team
+- **Chose:** Google sign-in as an extra way in, checked on the backend with Google's `google-auth` library; email and password stay
+- **Rejected:** Google as the only login, and keeping email and password only (D2)
+- **Why:** The browser flow needs only the public client ID, not a secret, and sign-in is off when `GOOGLE_CLIENT_ID` is empty. Google sign-in needs internet, so the offline demo keeps using email and password.

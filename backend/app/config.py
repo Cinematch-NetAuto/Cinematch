@@ -39,3 +39,6 @@ CORS_ORIGINS = [  # websites allowed to call our API, comma-separated in .env
     for origin in os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
     if origin.strip()
 ]
+
+# --- Google sign-in (optional) ----------------------------------------------
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")  # empty: Google sign-in is off

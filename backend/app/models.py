@@ -36,7 +36,8 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)  # SERIAL: the database numbers users
     email: Mapped[str] = mapped_column(Text, unique=True)  # always stored lowercased
-    password_hash: Mapped[str] = mapped_column(Text)  # bcrypt output, never the password
+    password_hash: Mapped[str | None] = mapped_column(Text)  # bcrypt; None = Google only
+    google_id: Mapped[str | None] = mapped_column(Text, unique=True)  # Google's "sub" id
     display_name: Mapped[str] = mapped_column(Text)
     content_language: Mapped[str] = mapped_column(Text, server_default="en-US")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

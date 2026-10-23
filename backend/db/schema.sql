@@ -1,17 +1,23 @@
 -- CineMatch database: 8 tables.
 -- Run with:  python -m scripts.init_db   (from backend/)
--- Safe to run more than once: every statement uses IF NOT EXISTS.
+-- Safe to run more than once: every statement checks first or changes nothing twice.
 -- Read top to bottom: tables that others point at come first.
 
 -- People with accounts.
 CREATE TABLE IF NOT EXISTS users (
     id               SERIAL PRIMARY KEY,
     email            TEXT NOT NULL UNIQUE,          -- always stored lowercased
-    password_hash    TEXT NOT NULL,                 -- bcrypt output, never the password
+    password_hash    TEXT,                          -- bcrypt output; empty for Google-only accounts
+    google_id        TEXT UNIQUE,                   -- Google's fixed id for this person, if linked
     display_name     TEXT NOT NULL,
     content_language TEXT NOT NULL DEFAULT 'en-US', -- language for titles and overviews
     created_at       TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Google sign-in came later. These two lines bring an older database up to date;
+-- on a new database they change nothing.
+ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS google_id TEXT UNIQUE;
 
 -- TMDB's genre list, copied once at setup. The ids are TMDB's, not ours.
 CREATE TABLE IF NOT EXISTS genres (
