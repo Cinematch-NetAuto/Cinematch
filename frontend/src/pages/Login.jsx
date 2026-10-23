@@ -1,12 +1,14 @@
 // Log in, at /login. After logging in you go back to the page that sent you
 // here (location.state.from), or to Home. A logged-in visitor goes straight on.
 import { useState } from 'react'
-import { Link, Navigate, useLocation } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { GoogleLogin } from '@react-oauth/google'
 import { useAuth } from '../context/AuthContext.jsx'
 
 export default function Login() {
-  const { user, login } = useAuth()
+  const { user, login, googleLogin } = useAuth()
   const location = useLocation()
+  const navigate = useNavigate()
   const goTo = location.state?.from || '/'
 
   const [email, setEmail] = useState('')
@@ -29,6 +31,27 @@ export default function Login() {
     } catch (failure) {
       setError(failure.message) // for example "Invalid email or password"
       setBusy(false)
+    }
+  }
+
+  async function handleGoogleSuccess(credentialResponse) {
+    setBusy(true)
+    setError('')
+    try {
+      await googleLogin(credentialResponse.credential)
+    } catch (failure) {
+      if (failure.status === 442) {
+        // New user detected! Send them to register to pick 3 genres
+        navigate('/register', { 
+          state: { 
+            ...location.state, 
+            googleCredential: credentialResponse.credential 
+          } 
+        })
+      } else {
+        setError(failure.message)
+        setBusy(false)
+      }
     }
   }
 
@@ -63,6 +86,15 @@ export default function Login() {
           {busy ? 'Logging in…' : 'Log in'}
         </button>
       </form>
+
+      <p style={{ textAlign: 'center', marginBottom: '1rem' }}>— or log in with email —</p>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>
+        <GoogleLogin
+          onSuccess={handleGoogleSuccess}
+          onError={() => setError('Google Sign-In failed. Please try again.')}
+        />
+      </div>
+      
       <p>
         No account yet?{' '}
         <Link to="/register" state={location.state}>

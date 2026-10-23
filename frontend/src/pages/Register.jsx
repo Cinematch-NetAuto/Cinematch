@@ -23,8 +23,10 @@ function check({ displayName, email, password, genreIds }) {
 }
 
 export default function Register() {
-  const { user, register } = useAuth()
+  const { user, register, googleLogin } = useAuth()
   const location = useLocation()
+
+  const googleCredential = location.state?.googleCredential
 
   const [displayName, setDisplayName] = useState('')
   const [email, setEmail] = useState('')
@@ -54,73 +56,97 @@ export default function Register() {
 
   async function handleSubmit(event) {
     event.preventDefault()
-    const details = { displayName, email, password, genreIds }
-    const found = check(details)
-    setProblems(found)
-    setFormError('')
-    if (Object.keys(found).length > 0) return
-    setBusy(true)
-    try {
-      await register({ ...details, displayName: displayName.trim(), email: email.trim() })
-    } catch (failure) {
-      if (failure.status === 409) setProblems({ email: 'That email already has an account.' })
-      else setFormError(failure.message)
-      setBusy(false)
+
+    if (googleCredential) {
+      // --- GOOGLE REGISTRATION PATH ---
+      if (genreIds.length < MIN_GENRES) {
+        setProblems({ genres: `Choose at least ${MIN_GENRES} genres.` })
+        return
+      }
+      setProblems({})
+      setFormError('')
+      setBusy(true)
+      try {
+        await googleLogin(googleCredential, genreIds)
+      } catch (failure) {
+        setFormError(failure.message)
+        setBusy(false)
+      }
+    } else {
+      // --- STANDARD REGISTRATION PATH ---
+      const details = { displayName, email, password, genreIds }
+      const found = check(details)
+      setProblems(found)
+      setFormError('')
+      if (Object.keys(found).length > 0) return
+      setBusy(true)
+      try {
+        await register({ ...details, displayName: displayName.trim(), email: email.trim() })
+      } catch (failure) {
+        if (failure.status === 409) setProblems({ email: 'That email already has an account.' })
+        else setFormError(failure.message)
+        setBusy(false)
+      }
     }
   }
 
   return (
     <section className="form-page">
-      <h1>Sign up</h1>
+      <h1>{googleCredential ? 'Complete Sign Up' : 'Sign up'}</h1>
       <form className="form" onSubmit={handleSubmit} noValidate>
-        <label className="field">
-          <span className="field-label">Your name</span>
-          <input
-            autoComplete="nickname"
-            value={displayName}
-            onChange={(event) => setDisplayName(event.target.value)}
-            aria-invalid={Boolean(problems.displayName)}
-            aria-describedby="name-problem"
-          />
-          {problems.displayName && <span className="field-error" id="name-problem">{problems.displayName}</span>}
-        </label>
+        
+        {!googleCredential && (
+          <>
+            <label className="field">
+              <span className="field-label">Your name</span>
+              <input
+                autoComplete="nickname"
+                value={displayName}
+                onChange={(event) => setDisplayName(event.target.value)}
+                aria-invalid={Boolean(problems.displayName)}
+                aria-describedby="name-problem"
+              />
+              {problems.displayName && <span className="field-error" id="name-problem">{problems.displayName}</span>}
+            </label>
 
-        <label className="field">
-          <span className="field-label">Email</span>
-          <input
-            type="email"
-            autoComplete="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            aria-invalid={Boolean(problems.email)}
-            aria-describedby="email-problem"
-          />
-          {problems.email && (
-            <span className="field-error" id="email-problem">
-              {problems.email}
-              {problems.email.includes('already') && (
-                <>
-                  {' '}
-                  <Link to="/login">Log in instead</Link>
-                </>
+            <label className="field">
+              <span className="field-label">Email</span>
+              <input
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                aria-invalid={Boolean(problems.email)}
+                aria-describedby="email-problem"
+              />
+              {problems.email && (
+                <span className="field-error" id="email-problem">
+                  {problems.email}
+                  {problems.email.includes('already') && (
+                    <>
+                      {' '}
+                      <Link to="/login">Log in instead</Link>
+                    </>
+                  )}
+                </span>
               )}
-            </span>
-          )}
-        </label>
+            </label>
 
-        <label className="field">
-          <span className="field-label">Password</span>
-          <span className="field-hint">At least 8 characters.</span>
-          <input
-            type="password"
-            autoComplete="new-password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            aria-invalid={Boolean(problems.password)}
-            aria-describedby="password-problem"
-          />
-          {problems.password && <span className="field-error" id="password-problem">{problems.password}</span>}
-        </label>
+            <label className="field">
+              <span className="field-label">Password</span>
+              <span className="field-hint">At least 8 characters.</span>
+              <input
+                type="password"
+                autoComplete="new-password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                aria-invalid={Boolean(problems.password)}
+                aria-describedby="password-problem"
+              />
+              {problems.password && <span className="field-error" id="password-problem">{problems.password}</span>}
+            </label>
+          </>
+        )}
 
         <fieldset className="field">
           <legend className="field-label">Genres you like</legend>
@@ -156,9 +182,12 @@ export default function Register() {
           {busy ? 'Creating your account…' : 'Create account'}
         </button>
       </form>
-      <p>
-        Already have an account? <Link to="/login" state={location.state}>Log in</Link>
-      </p>
+      
+      {!googleCredential && (
+        <p>
+          Already have an account? <Link to="/login" state={location.state}>Log in</Link>
+        </p>
+      )}
     </section>
   )
 }
