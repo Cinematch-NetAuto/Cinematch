@@ -36,6 +36,7 @@ phase 13.
 | Database: the 8 tables (`db/schema.sql`), `scripts/init_db.py`, demo data (`scripts/seed_data.py`) | done |
 | Backend: movies — genres, title search, filters, film page, TMDB cache | done |
 | Backend: accounts — register, login, `GET /api/users/me` | done |
+| Backend: Google sign-in — `POST /api/auth/google` | done — needs `GOOGLE_CLIENT_ID` in `.env`; the Log in page has no Google button yet |
 | Backend: likes, dislikes, watch history | done |
 | Backend: preferences — `GET` / `PATCH /api/me/preferences` | done |
 | Backend: recommendations — 20 films, each with a score and a reason | done |

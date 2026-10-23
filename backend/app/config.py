@@ -40,5 +40,5 @@ CORS_ORIGINS = [  # websites allowed to call our API, comma-separated in .env
     if origin.strip()
 ]
 
-# --- Google SSO ---
-GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
+# --- Google sign-in (optional) ----------------------------------------------
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")  # empty: Google sign-in is off
