@@ -15,6 +15,7 @@ python-dotenv==1.0.1      # loads .env into the environment
 
 # --- Outside world ---------------------------------------------------------
 requests==2.32.3          # how we call TMDB
+google-auth==2.35.0       # Google sign-in
 
 # --- Login security --------------------------------------------------------
 bcrypt==4.2.1             # password hashing (one-way, deliberately slow)

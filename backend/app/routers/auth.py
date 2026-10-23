@@ -12,8 +12,8 @@ from sqlalchemy.exc import IntegrityError
 
 from app.deps import CurrentUser, Db
 from app.models import User, UserPreferences
-from app.schemas import LoginRequest, TokenResponse, UserCreate, UserOut
-from app.security import create_token, hash_password, verify_password
+from app.schemas import LoginRequest, TokenResponse, UserCreate, UserOut, GoogleLogin
+from app.security import create_token, hash_password, verify_password, verify_google_token
 from app.services import movies as movie_service
 from app.tmdb import TmdbError
 
@@ -75,3 +75,56 @@ def login(body: LoginRequest, db: Db):
 def me(user: CurrentUser):
     """The logged-in user. On /docs, click Authorize and paste a token first."""
     return user
+
+@router.get("/auth/google", response_model=TokenResponse, status_code=status.HTTP_200_OK)
+def google_sso(body: GoogleLogin, db: Db):
+    """Log in or sign up with Google. New users must provide genre_ids."""
+    idinfo = verify_google_token(body.credential)
+    email = idinfo["email"]
+    google_id = idinfo["sub"]
+    display_name = idinfo.get("name", email.split("@")[0])
+
+    # Check if user already exists
+    user = db.scalar(select(User).where(User.email == email))
+
+    if user:
+        # Link Google ID if it's a local account logging in with Google for the first time
+        if not user.google_id:
+            user.google_id = google_id
+            db.commit()
+        return user
+
+    # --- New User Registration Flow ---
+    if not body.genre_ids or len(body.genre_ids) < 3:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY, 
+            "New accounts must provide at least 3 starter genres"
+        )
+
+    # Validate genres against TMDB exactly like local registration
+    try:
+        known = {genre.id for genre in movie_service.list_genres(db)}
+    except TmdbError as error:
+        raise HTTPException(status.HTTP_502_BAD_GATEWAY, "Genre list unavailable") from error
+        
+    unknown = sorted(set(body.genre_ids) - known)
+    if unknown:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, f"Unknown genre ids: {unknown}")
+
+    new_user = User(
+        email=email, 
+        display_name=display_name, 
+        google_id=google_id,
+        password_hash=None  # No local password
+    )
+    
+    try:
+        db.add(new_user)
+        db.flush()
+        db.add(UserPreferences(user_id=new_user.id, preferred_genres=body.genre_ids))
+        db.commit()
+    except IntegrityError as error:
+        db.rollback()
+        raise HTTPException(status.HTTP_409_CONFLICT, "Email already registered") from error
+        
+    return TokenResponse(access_token=create_token(new_user.id))

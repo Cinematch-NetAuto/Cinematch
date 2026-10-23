@@ -9,6 +9,10 @@ that passes read_token(). This is the only file that uses the jwt library.
 """
 
 from datetime import UTC, datetime, timedelta
+from google.oauth2 import id_token
+from google.auth.transport import requests
+from fastapi import HTTPException, status
+from app.config import GOOGLE_CLIENT_ID
 
 import bcrypt
 import jwt
@@ -82,3 +86,18 @@ def read_token(token: str) -> int:
         return int(payload["sub"])
     except (jwt.PyJWTError, ValueError) as error:
         raise InvalidToken(str(error)) from error
+
+def verify_google_token(token: str) -> dict:
+    try:
+        # Verifies the signature and the audience (your client ID)
+        idinfo = id_token.verify_oauth2_token(
+            token, 
+            requests.Request(), 
+            GOOGLE_CLIENT_ID
+        )
+        return idinfo
+    except ValueError as error:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail="Invalid Google token"
+        ) from error

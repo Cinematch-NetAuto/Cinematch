@@ -7,7 +7,8 @@
 CREATE TABLE IF NOT EXISTS users (
     id               SERIAL PRIMARY KEY,
     email            TEXT NOT NULL UNIQUE,          -- always stored lowercased
-    password_hash    TEXT NOT NULL,                 -- bcrypt output, never the password
+    password_hash    TEXT,                 -- bcrypt output, never the password, optional for Google SSO users
+    google_id        TEXT UNIQUE,          -- optional field for Google SSO users
     display_name     TEXT NOT NULL,
     content_language TEXT NOT NULL DEFAULT 'en-US', -- language for titles and overviews
     created_at       TIMESTAMPTZ NOT NULL DEFAULT now()

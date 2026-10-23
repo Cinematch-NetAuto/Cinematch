@@ -192,3 +192,10 @@ class Recommendation(MovieCard):
 
     score: float  # 0.0 to 1.0: 0.7 x genre fit + 0.3 x fair rating
     reason: str  # e.g. "Because you liked Inception"
+
+class GoogleLogin(BaseModel):
+    credential: str
+    genre_ids: list[int] | None = Field(
+        default=None,
+        description="At least 3 genre IDs required if this is a new user"
+    )
