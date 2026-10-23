@@ -111,7 +111,8 @@ export function describe(filters, genres) {
   return `${parts.join(', ')}.`
 }
 
-function Tile({ chosen, onClick, children }) {
+// A choice button that stays pressed while chosen. Preferences uses it too.
+export function Tile({ chosen, onClick, children }) {
   return (
     <button type="button" className="tile" aria-pressed={chosen} onClick={onClick}>
       {children}
