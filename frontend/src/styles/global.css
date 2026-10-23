@@ -1,0 +1,783 @@
+/* Base styles for every page. Uses only the variables in tokens.css.
+ *
+ * The fonts come from npm packages (@fontsource) and are bundled with the app,
+ * so they work without internet (the offline demo).
+ */
+@import '@fontsource/league-gothic/400.css';
+@import '@fontsource/atkinson-hyperlegible/400.css';
+@import '@fontsource/atkinson-hyperlegible/700.css';
+@import './tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+}
+
+/* The sky glow covers the first screen; below it the page is plain Night. */
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--gradient-sky) top center / 100% 100vh no-repeat, var(--night);
+  color: var(--screen);
+  font-family: var(--font-text);
+  font-size: var(--fs-body);
+  line-height: var(--lh-text);
+}
+
+/* League Gothic is for page titles and section headings only, set in capitals
+   like a film poster's title block. */
+h1,
+h2 {
+  margin: 0 0 var(--s3);
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: var(--lh-display);
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: var(--fs-page);
+}
+
+h2 {
+  font-size: var(--fs-section);
+}
+
+h3 {
+  margin: 0 0 var(--s2);
+  font-size: var(--fs-card);
+  font-weight: 700;
+}
+
+p {
+  margin: 0 0 var(--s3);
+  max-width: var(--measure);
+}
+
+a {
+  color: var(--marquee);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Keyboard users always see where they are. */
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* The browser's grey placeholder is under 4.5 : 1 on a Dusk input (3.65 : 1). */
+::placeholder {
+  color: var(--programme);
+  opacity: 1;
+}
+
+/* The design has no motion (docs/design.md, "Motion: none"). This keeps it that
+ * way if a later change adds some, for people who ask for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+::selection {
+  background: var(--marquee);
+  color: var(--night);
+}
+
+/* ---- The page frame: Layout, NavBar and footer ---- */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.page-main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--s6) var(--gutter);
+}
+
+/* Hidden above the page until a keyboard user tabs to it. */
+.skip-link {
+  position: absolute;
+  top: calc(-1 * var(--s7));
+  left: var(--s2);
+  padding: var(--s2) var(--s4);
+  border-radius: var(--radius-control);
+  background: var(--marquee);
+  color: var(--night);
+}
+
+.skip-link:focus {
+  top: var(--s2);
+}
+
+.nav {
+  border-bottom: 1px solid var(--hairline-gold);
+}
+
+.nav-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s2) var(--s6);
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--s3) var(--gutter);
+}
+
+.nav-name {
+  font-family: var(--font-display);
+  font-size: var(--fs-section);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tracking-name);
+  text-transform: uppercase;
+  color: var(--screen);
+}
+
+.nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1) var(--s5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nav-account {
+  margin-left: auto;
+}
+
+/* When the nav bar wraps onto several lines, every line starts on the left. */
+@media (max-width: 900px) {
+  .nav-account {
+    margin-left: 0;
+  }
+}
+
+.nav-link {
+  display: inline-block;
+  padding: var(--s1) 0;
+  font-size: var(--fs-caption);
+  color: var(--programme);
+}
+
+.nav-name:hover,
+.nav-link:hover {
+  color: var(--screen);
+  text-decoration: none;
+}
+
+.nav-link.active {
+  color: var(--marquee);
+}
+
+/* "Log out" is a button that looks like the nav links. */
+.nav-button {
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.nav-user {
+  padding: var(--s1) 0;
+  font-size: var(--fs-caption);
+  color: var(--screen);
+}
+
+.page-footer {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--s5) var(--gutter) var(--s6);
+  border-top: 1px solid var(--hairline);
+  font-size: var(--fs-caption);
+  color: var(--programme);
+}
+
+.page-footer p {
+  margin: 0 0 var(--s1);
+}
+
+/* ---- Shared pieces ---- */
+
+/* Read by screen readers, invisible on screen. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* The poster grid: 2 columns on a phone, 6 on a laptop, no media query. */
+.poster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--poster-min), 1fr));
+  gap: var(--s4);
+}
+
+/* Main button: a lit marquee bulb. Quiet button: a dusk panel. */
+.button {
+  display: inline-block;
+  padding: var(--s2) var(--s5);
+  border: 1px solid var(--marquee);
+  border-radius: var(--radius-control);
+  background: var(--gradient-bulb);
+  color: var(--night);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.button-quiet {
+  border-color: var(--hairline);
+  background: var(--gradient-panel);
+  color: var(--screen);
+}
+
+.button:hover {
+  filter: brightness(1.1);
+  text-decoration: none;
+}
+
+.button:active {
+  transform: translateY(1px);
+}
+
+.button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---- Home page ---- */
+
+.home-welcome {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s3) var(--s5);
+  margin-bottom: var(--s6);
+}
+
+.home-welcome p {
+  margin: 0;
+  color: var(--programme);
+}
+
+.home-section {
+  margin-bottom: var(--s7);
+}
+
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s2) var(--s4);
+}
+
+/* ---- A film's page (MovieDetail.jsx) ---- */
+
+.film-hero {
+  position: relative;
+  margin-bottom: var(--s5);
+}
+
+/* The wide still, fading into Night at the bottom. */
+.film-backdrop {
+  position: absolute;
+  inset: 0 0 auto 0;
+  width: 100%;
+  height: var(--backdrop-height);
+  object-fit: cover;
+  /* Text sits on this image. At 0.2, even a pure white pixel leaves Programme
+   * text at 4.55 : 1; at the old 0.5 it was 1.48 : 1. */
+  opacity: 0.2;
+  mask-image: linear-gradient(to bottom, var(--night) 30%, transparent);
+}
+
+.film-hero-inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, var(--film-poster)) minmax(0, 1fr);
+  align-items: end;
+  gap: var(--s5);
+  padding-top: var(--s7);
+}
+
+.film-poster {
+  border: 1px solid var(--hairline);
+}
+
+.film-title {
+  margin-bottom: var(--s2);
+  font-size: var(--fs-hero);
+}
+
+.film-tagline {
+  font-size: var(--fs-card);
+}
+
+.film-facts {
+  margin-bottom: var(--s1);
+  color: var(--programme);
+}
+
+.film-facts span + span::before {
+  content: '';
+  margin-left: var(--s2);
+}
+
+.film-actions {
+  margin-bottom: var(--s6);
+}
+
+.choice-dislike[aria-pressed='true'] {
+  border-color: var(--exit-sign);
+  background: var(--gradient-panel);
+  color: var(--exit-sign);
+}
+
+.cast {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--poster-min), 1fr));
+  gap: var(--s4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cast li {
+  display: grid;
+  gap: var(--s1);
+  font-size: var(--fs-caption);
+}
+
+.cast-photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: var(--radius-poster);
+  background: var(--gradient-panel);
+}
+
+.cast-role {
+  color: var(--programme);
+}
+
+/* Phones: the poster sits above the title instead of beside it. */
+@media (max-width: 600px) {
+  .film-hero-inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .film-hero .film-poster {
+    width: 60%;
+  }
+}
+
+/* ---- Your library (Library.jsx) ---- */
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s5);
+  margin-bottom: var(--s5);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.tab {
+  margin-bottom: -1px; /* the chosen tab's line sits on the row's line */
+  padding: var(--s2) 0;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: none;
+  color: var(--programme);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tab[aria-selected='true'] {
+  border-bottom-color: var(--marquee);
+  color: var(--screen);
+}
+
+.tab-count {
+  font-weight: 400;
+  color: var(--programme);
+}
+
+.library-item {
+  display: grid;
+  gap: var(--s1);
+  align-content: start;
+}
+
+.library-note {
+  font-size: var(--fs-caption);
+  color: var(--programme);
+}
+
+.library-remove {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: var(--fs-caption);
+  color: var(--exit-sign);
+  cursor: pointer;
+}
+
+.library-remove:hover {
+  text-decoration: underline;
+}
+
+/* ---- Recommendations (Recommendations.jsx, ReasonChip.jsx) ---- */
+
+.recommendation {
+  display: grid;
+  gap: var(--s2);
+  align-content: start;
+}
+
+/* The reason ticket: a dusk panel with a half-circle notch cut from each side,
+ * so the night shows through. No outline and no shadow. In a mask only the
+ * opacity counts, so the Night in it is just "solid". */
+.reason-ticket {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  margin: 0;
+  background: var(--gradient-panel);
+  mask:
+    radial-gradient(circle at 0 50%, transparent var(--notch), var(--night) calc(var(--notch) + 0.5px))
+      left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 50%, transparent var(--notch), var(--night) calc(var(--notch) + 0.5px))
+      right / 51% 100% no-repeat;
+}
+
+.reason-text {
+  display: grid;
+  gap: var(--s1);
+  min-width: 0;
+  padding: var(--s2) var(--s3) var(--s2) var(--s4); /* the left side clears the notch */
+  font-size: var(--fs-caption);
+  overflow-wrap: anywhere;
+}
+
+.reason {
+  font-weight: 700;
+  color: var(--marquee);
+}
+
+.reason-genres {
+  color: var(--programme);
+}
+
+/* The stub: the rating, past a dashed tear line. */
+.reason-stub {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--s4) 0 var(--s3); /* the right side clears the notch */
+  border-left: 2px dashed var(--tear-line);
+  font-family: var(--font-display);
+  font-size: var(--fs-card);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tracking-display);
+  color: var(--screen);
+}
+
+/* ---- Search page ---- */
+
+.search-field {
+  max-width: var(--form-width);
+  margin-bottom: var(--s5);
+}
+
+.search-hint {
+  color: var(--programme);
+}
+
+/* ---- The film picker (FilterPanel.jsx) ---- */
+
+.filter-panel {
+  display: grid;
+  gap: var(--s5);
+  margin-bottom: var(--s6);
+}
+
+.field select {
+  max-width: var(--form-width);
+  padding: var(--s2) var(--s3);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-control);
+  background: var(--dusk);
+}
+
+.more-filters summary {
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  color: var(--marquee);
+  cursor: pointer;
+}
+
+.more-filters-body {
+  display: grid;
+  gap: var(--s4);
+  margin-top: var(--s3);
+}
+
+.filter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s3);
+  padding-top: var(--s4);
+  border-top: 1px solid var(--hairline);
+}
+
+.filter-summary {
+  flex: 1 1 100%;
+  margin: 0;
+  color: var(--programme);
+}
+
+/* ---- Page control (Paginator.jsx) ---- */
+
+.paginator {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s3) var(--s4);
+  margin-top: var(--s6);
+}
+
+.paginator-where {
+  font-size: var(--fs-caption);
+}
+
+.paginator-size {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  margin-left: auto;
+  font-size: var(--fs-caption);
+  color: var(--programme);
+}
+
+.paginator-size .tiles {
+  margin: 0;
+}
+
+/* ---- Poster cards (MovieCard.jsx, MovieGrid.jsx) ---- */
+
+.movie-grid {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.movie-card {
+  display: grid;
+  gap: var(--s1);
+  color: var(--screen);
+}
+
+.movie-card:hover {
+  text-decoration: none;
+}
+
+.poster {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: var(--radius-poster);
+  background: var(--gradient-panel); /* shows while the image loads */
+}
+
+/* No poster: a dusk panel with the title, set like a poster title. */
+.poster-empty {
+  display: flex;
+  align-items: flex-end;
+  padding: var(--s3);
+  border: 1px solid var(--hairline);
+  font-family: var(--font-display);
+  font-size: var(--fs-card);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+  color: var(--programme);
+  overflow: hidden;
+}
+
+.movie-title {
+  margin-top: var(--s1);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.movie-card:hover .movie-title {
+  color: var(--marquee);
+}
+
+.movie-meta {
+  display: flex;
+  gap: var(--s3);
+  font-size: var(--fs-caption);
+  color: var(--programme);
+}
+
+/* ---- Loading, empty and error states (States.jsx) ---- */
+
+.poster-block {
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-poster);
+  background: var(--gradient-panel);
+}
+
+.state {
+  padding: var(--s6) 0;
+}
+
+.state-title {
+  margin-bottom: var(--s2);
+  font-size: var(--fs-card);
+  font-weight: 700;
+}
+
+.state-error {
+  color: var(--exit-sign);
+}
+
+.state .button {
+  margin-top: var(--s2);
+}
+
+/* ---- Forms: Log in and Sign up ---- */
+
+.form-page {
+  max-width: var(--form-width);
+}
+
+.form {
+  display: grid;
+  gap: var(--s5);
+  margin-bottom: var(--s5);
+}
+
+.field {
+  display: grid;
+  gap: var(--s1);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.field-label {
+  padding: 0;
+  font-size: var(--fs-caption);
+  font-weight: 700;
+}
+
+.field-hint {
+  margin: 0;
+  font-size: var(--fs-caption);
+  color: var(--programme);
+}
+
+.form-or {
+  margin: 0 0 var(--s3);
+  text-align: center;
+  font-size: var(--fs-caption);
+  color: var(--programme);
+}
+
+.google-button {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--s5);
+}
+
+.field input {
+  padding: var(--s2) var(--s3);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-control);
+  background: var(--dusk);
+}
+
+.field input[aria-invalid='true'] {
+  border-color: var(--exit-sign);
+}
+
+.field-error,
+.form-error {
+  margin: 0;
+  font-size: var(--fs-caption);
+  color: var(--exit-sign);
+}
+
+.form .button {
+  justify-self: start;
+}
+
+/* Tiles: the film picker's toggle buttons. A chosen tile is a lit bulb. */
+.tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  margin: var(--s2) 0;
+}
+
+.tile {
+  padding: var(--s2) var(--s4);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-control);
+  background: var(--gradient-panel);
+  font-size: var(--fs-caption);
+  cursor: pointer;
+}
+
+.tile:hover {
+  border-color: var(--programme);
+}
+
+.tile[aria-pressed='true'] {
+  border-color: var(--marquee);
+  background: var(--gradient-bulb);
+  color: var(--night);
+  font-weight: 700;
+}

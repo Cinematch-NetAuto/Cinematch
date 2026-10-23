@@ -1,0 +1,46 @@
+# ---------------------------------------------------------------------------
+# Secrets — never commit these.
+# .env holds the REAL TMDB token, JWT secret and database password.
+# .env.example is the safe template, and that one IS committed.
+# ---------------------------------------------------------------------------
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# --- Python ----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+# Produced by the pipeline: pytest --cov=app --junitxml=junit.xml
+junit.xml
+*.log
+
+# --- Node ------------------------------------------------------------------
+node_modules/
+dist/
+.vite/
+npm-debug.log*
+yarn-error.log*
+
+# --- Editors ---------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+
+# --- Operating system ------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Local data ------------------------------------------------------------
+*.sqlite3
+/backend/cache/

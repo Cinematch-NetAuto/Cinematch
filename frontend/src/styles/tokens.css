@@ -1,0 +1,75 @@
+/* Design tokens: every colour, font, size and space in CineMatch.
+ *
+ * The values come from docs/design.md. This is the ONLY file that may contain a
+ * colour, a font name or a raw size. Every other file uses these variables, so a
+ * change here changes the whole site.
+ */
+
+:root {
+  /* Colours (docs/design.md, "Colours") */
+  --night: #04070d;              /* page background */
+  --night-glow: #0c1528;         /* the sky glow */
+  --night-glow-top: #16264a;     /* the brightest point of the sky glow */
+  --dusk: #121d33;               /* panels, tiles, inputs */
+  --dusk-deep: #0b1324;          /* bottom of the panel sheen */
+  --screen: #e8edf5;             /* headings and main text */
+  --programme: #93a3bd;          /* years, counts, hints, captions */
+  --marquee: #f2a93b;            /* everything you can click or have chosen */
+  --marquee-light: #f8c76e;      /* top of the lit-bulb gradient */
+  --exit-sign: #ff7f6b;          /* dislikes and errors */
+  --hairline: #1e2b45;           /* borders and dividers */
+  --hairline-gold: rgb(242 169 59 / 0.18); /* the line under the nav bar */
+  --tear-line: rgb(147 163 189 / 0.35);    /* the reason ticket's dashed tear line */
+
+  /* The three gradients, and only these (docs/design.md, "Gradients") */
+  --gradient-sky: radial-gradient(120% 70% at 50% -10%,
+      var(--night-glow-top) 0%, var(--night-glow) 38%, var(--night) 100%);
+  --gradient-panel: linear-gradient(180deg, var(--dusk) 0%, var(--dusk-deep) 100%);
+  --gradient-bulb: linear-gradient(180deg, var(--marquee-light) 0%, var(--marquee) 100%);
+
+  /* Type */
+  --font-display: 'League Gothic', 'Arial Narrow', sans-serif; /* headings */
+  --font-text: 'Atkinson Hyperlegible', system-ui, sans-serif; /* everything else */
+  --fs-caption: 14px;
+  --fs-body: 16px;
+  --fs-card: 20px;
+  --fs-section: 28px;
+  --fs-page: 40px;
+  --fs-hero: 64px;               /* the film title on the film page */
+  --lh-text: 1.5;
+  --lh-display: 1.05;
+  --tracking-display: 1.5px;
+  --tracking-name: 3px;          /* the CINEMATCH name in the nav bar */
+  --measure: 75ch;               /* the longest a line of text may be */
+
+  /* Space: only these steps */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+
+  /* Shape: corners follow the object */
+  --radius-poster: 4px;
+  --radius-control: 8px;
+  --notch: 9px;                  /* the reason ticket's side notches */
+  --focus-ring: 2px solid var(--marquee);
+  --focus-offset: 2px;
+
+  /* Layout */
+  --max-width: 1200px;
+  --gutter: var(--s5);
+  --poster-min: 160px;           /* the narrowest a poster column may be */
+  --form-width: 560px;           /* log in and sign up forms */
+  --film-poster: 220px;          /* the poster on a film's page */
+  --backdrop-height: 380px;      /* the wide still atop a film's page */
+}
+
+/* Phones: a smaller side margin. */
+@media (max-width: 600px) {
+  :root {
+    --gutter: var(--s4);
+  }
+}

@@ -1,0 +1,52 @@
+# PostgreSQL for everyone, plus Jenkins for the one laptop that runs it.
+#
+# The backend and frontend run directly on your machine so you keep hot
+# reload and a normal debugger. Only the database is containerised, because
+# installing Postgres natively on four different laptops is where group
+# projects lose their first week.
+#
+#   docker compose up -d db     start it
+#   docker compose ps           check it says (healthy)
+#   docker compose down         stop it (data is kept)
+#
+#   docker compose up -d jenkins    start Jenkins (only on the CI laptop)
+
+services:
+  db:
+    image: postgres:16
+    container_name: cinematch-db
+    environment:
+      POSTGRES_USER: cinematch
+      POSTGRES_PASSWORD: cinematch
+      POSTGRES_DB: cinematch
+    ports:
+      # host:container — 5432 on your machine reaches 5432 inside.
+      - "5432:5432"
+    volumes:
+      # Named volume, so `docker compose down` does not wipe your data.
+      - cinematch-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # The W1 gate is "docker compose ps shows healthy on all 4 machines".
+      # Without this block the container reports "up" before Postgres is
+      # actually ready to accept connections.
+      test: ["CMD-SHELL", "pg_isready -U cinematch -d cinematch"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  jenkins:
+    build: ./jenkins
+    container_name: cinematch-jenkins
+    # The "ci" profile keeps a plain `docker compose up -d` from starting
+    # Jenkins on every laptop. Naming the service starts it.
+    profiles: ["ci"]
+    ports:
+      # 8081, not 8080: 8080 clashes with too many other programs.
+      - "8081:8080"
+    volumes:
+      # Jobs, plugins and build history survive `docker compose down`.
+      - cinematch-jenkins:/var/jenkins_home
+
+volumes:
+  cinematch-pgdata:
+  cinematch-jenkins:

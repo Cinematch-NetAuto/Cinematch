@@ -1,0 +1,20 @@
+# Settings for the two commands everyone runs before pushing:
+#     pytest -q
+#     ruff check .
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+# E/F  = the standard error and pyflakes rules (real mistakes)
+# I    = import sorting, so four people never fight over import order
+# UP   = prefer modern Python syntax
+# B    = common bug patterns (e.g. mutable default arguments)
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+# Where the tests live, and where to import "app" from, so `pytest` works
+# from the backend folder with no extra setup.
+testpaths = ["tests"]
+pythonpath = ["."]

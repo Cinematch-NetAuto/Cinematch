@@ -1,0 +1,28 @@
+# Pinned on purpose: the same versions on four laptops and in the build
+# pipeline means "works on my machine" is never the explanation.
+
+# --- Web framework ---------------------------------------------------------
+fastapi==0.115.6          # routes, validation, and the free /docs page
+uvicorn[standard]==0.34.0 # the server that actually runs FastAPI
+
+# --- Database --------------------------------------------------------------
+sqlalchemy==2.0.36        # Python classes <-> database tables
+psycopg[binary]==3.2.3    # the PostgreSQL driver SQLAlchemy talks through
+
+# --- Data shapes and config ------------------------------------------------
+pydantic==2.10.4          # checks every request and response shape
+python-dotenv==1.0.1      # loads .env into the environment
+
+# --- Outside world ---------------------------------------------------------
+requests==2.32.3          # how we call TMDB
+google-auth==2.35.0       # Google sign-in
+
+# --- Login security --------------------------------------------------------
+bcrypt==4.2.1             # password hashing (one-way, deliberately slow)
+pyjwt==2.10.1             # signed login tokens
+
+# --- Development only ------------------------------------------------------
+pytest==8.3.4             # the test runner
+pytest-cov==6.0.0         # coverage report (pytest --cov=app)
+httpx==0.28.1             # lets tests call our API without a live server
+ruff==0.8.4               # linter, keeps four people's style identical
