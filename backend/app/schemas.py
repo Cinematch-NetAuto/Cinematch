@@ -193,9 +193,21 @@ class Recommendation(MovieCard):
     score: float  # 0.0 to 1.0: 0.7 x genre fit + 0.3 x fair rating
     reason: str  # e.g. "Because you liked Inception"
 
+
 class GoogleLogin(BaseModel):
-    credential: str
+    """Google sign-in: the ID token that the "Sign in with Google" button gave the browser.
+
+    genre_ids is optional. When it is sent, it needs 3 or more different genres, as at
+    sign-up, and a new account starts from them; otherwise it starts with none.
+    """
+
+    credential: str = Field(min_length=1)
     genre_ids: list[int] | None = Field(
-        default=None,
-        description="At least 3 genre IDs required if this is a new user"
+        default=None, description="Optional: at least 3 different genre ids for a new account"
     )
+
+    @field_validator("genre_ids")
+    @classmethod
+    def three_or_none(cls, genre_ids: list[int] | None) -> list[int] | None:
+        """None means "not sent"; a list that is sent needs 3 or more different genres."""
+        return None if genre_ids is None else _three_genres(genre_ids)

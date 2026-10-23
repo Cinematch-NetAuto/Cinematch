@@ -1,4 +1,4 @@
-"""Account endpoints: sign up, log in, and "who am I".
+"""Account endpoints: sign up, log in (with a password or with Google), and "who am I".
 
 Sign-up also saves the user's starter genres in user_preferences. A new user
 has no likes yet, so these genres are what the recommender starts from.
@@ -10,10 +10,18 @@ from fastapi import APIRouter, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
+from app.config import GOOGLE_CLIENT_ID
 from app.deps import CurrentUser, Db
 from app.models import User, UserPreferences
-from app.schemas import LoginRequest, TokenResponse, UserCreate, UserOut, GoogleLogin
-from app.security import create_token, hash_password, verify_password, verify_google_token
+from app.schemas import GoogleLogin, LoginRequest, TokenResponse, UserCreate, UserOut
+from app.security import (
+    GoogleUnreachable,
+    InvalidGoogleToken,
+    create_token,
+    hash_password,
+    verify_google_token,
+    verify_password,
+)
 from app.services import movies as movie_service
 from app.tmdb import TmdbError
 
@@ -63,8 +71,12 @@ def register(body: UserCreate, db: Db):
 def login(body: LoginRequest, db: Db):
     """Swap an email and password for a login token."""
     user = db.scalar(select(User).where(User.email == body.email))
-    password_ok = verify_password(body.password, user.password_hash if user else _stand_in_hash())
-    if user is None or not password_ok:
+    # A Google-only account has no password: check the stand-in so it takes as long.
+    has_password = user is not None and user.password_hash is not None
+    password_ok = verify_password(
+        body.password, user.password_hash if has_password else _stand_in_hash()
+    )
+    if not has_password or not password_ok:
         raise HTTPException(
             status.HTTP_401_UNAUTHORIZED, BAD_LOGIN, headers={"WWW-Authenticate": "Bearer"}
         )
@@ -76,55 +88,64 @@ def me(user: CurrentUser):
     """The logged-in user. On /docs, click Authorize and paste a token first."""
     return user
 
-@router.get("/auth/google", response_model=TokenResponse, status_code=status.HTTP_200_OK)
+
+@router.post("/auth/google", response_model=TokenResponse)
 def google_sso(body: GoogleLogin, db: Db):
-    """Log in or sign up with Google. New users must provide genre_ids."""
-    idinfo = verify_google_token(body.credential)
-    email = idinfo["email"]
-    google_id = idinfo["sub"]
-    display_name = idinfo.get("name", email.split("@")[0])
+    """Log in or sign up with Google, and answer with our own login token.
 
-    # Check if user already exists
-    user = db.scalar(select(User).where(User.email == email))
-
-    if user:
-        # Link Google ID if it's a local account logging in with Google for the first time
-        if not user.google_id:
-            user.google_id = google_id
-            db.commit()
-        return user
-
-    # --- New User Registration Flow ---
-    if not body.genre_ids or len(body.genre_ids) < 3:
-        raise HTTPException(
-            status.HTTP_422_UNPROCESSABLE_ENTITY, 
-            "New accounts must provide at least 3 starter genres"
-        )
-
-    # Validate genres against TMDB exactly like local registration
+    - Google's id is already saved: log that user in.
+    - The email already has an email-and-password account: link Google to it, but
+      only when Google says the email is verified and no other Google account is
+      linked. Otherwise anyone could take that account over.
+    - Otherwise: a new account with no password. Starter genres are optional; when
+      they are sent, they are checked as at sign-up.
+    """
+    if not GOOGLE_CLIENT_ID:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Google sign-in is not set up")
     try:
-        known = {genre.id for genre in movie_service.list_genres(db)}
-    except TmdbError as error:
-        raise HTTPException(status.HTTP_502_BAD_GATEWAY, "Genre list unavailable") from error
-        
-    unknown = sorted(set(body.genre_ids) - known)
-    if unknown:
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, f"Unknown genre ids: {unknown}")
+        idinfo = verify_google_token(body.credential)
+    except GoogleUnreachable as error:
+        raise HTTPException(status.HTTP_502_BAD_GATEWAY, "Google cannot be reached") from error
+    except InvalidGoogleToken as error:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid Google token") from error
 
-    new_user = User(
-        email=email, 
-        display_name=display_name, 
-        google_id=google_id,
-        password_hash=None  # No local password
-    )
-    
+    email = (idinfo.get("email") or "").lower()  # emails are always stored lowercased
+    if not email:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Google did not share an email address")
+    google_id = idinfo["sub"]
+
+    user = db.scalar(select(User).where(User.google_id == google_id))
+    if user is None:
+        user = db.scalar(select(User).where(User.email == email))
+        if user is not None:
+            if user.google_id is not None or not idinfo.get("email_verified"):
+                raise HTTPException(status.HTTP_409_CONFLICT, "Email already registered")
+            user.google_id = google_id  # link Google to the existing account
+            db.commit()
+    if user is not None:
+        return TokenResponse(access_token=create_token(user.id))
+
+    # --- New user ---
+    genre_ids = body.genre_ids or []
+    if genre_ids:  # checked against TMDB's list, exactly like sign-up
+        try:
+            known = {genre.id for genre in movie_service.list_genres(db)}
+        except TmdbError as error:
+            raise HTTPException(status.HTTP_502_BAD_GATEWAY, "Genre list unavailable") from error
+        unknown = sorted(set(genre_ids) - known)
+        if unknown:
+            raise HTTPException(
+                status.HTTP_422_UNPROCESSABLE_ENTITY, f"Unknown genre ids: {unknown}"
+            )
+
+    display_name = (idinfo.get("name") or email.split("@")[0])[:50]  # sign-up allows 50
+    new_user = User(email=email, display_name=display_name, google_id=google_id)
     try:
         db.add(new_user)
-        db.flush()
-        db.add(UserPreferences(user_id=new_user.id, preferred_genres=body.genre_ids))
+        db.flush()  # the database gives the user an id
+        db.add(UserPreferences(user_id=new_user.id, preferred_genres=genre_ids))
         db.commit()
-    except IntegrityError as error:
+    except IntegrityError as error:  # the same account was made a moment ago
         db.rollback()
         raise HTTPException(status.HTTP_409_CONFLICT, "Email already registered") from error
-        
     return TokenResponse(access_token=create_token(new_user.id))

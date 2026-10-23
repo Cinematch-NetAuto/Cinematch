@@ -6,18 +6,20 @@ impossible to turn back into the password. Only the hash is ever stored.
 A login token (JWT) is a signed note that says "this is user N, until time T".
 Anyone can read it, but only the server, which knows JWT_SECRET, can make one
 that passes read_token(). This is the only file that uses the jwt library.
+
+verify_google_token() checks the ID token that "Sign in with Google" gives the
+browser, with Google's google-auth library. That check needs internet.
 """
 
 from datetime import UTC, datetime, timedelta
-from google.oauth2 import id_token
-from google.auth.transport import requests
-from fastapi import HTTPException, status
-from app.config import GOOGLE_CLIENT_ID
 
 import bcrypt
 import jwt
+from google.auth import exceptions as google_exceptions
+from google.auth.transport import requests as google_requests
+from google.oauth2 import id_token
 
-from app.config import JWT_ALGORITHM, JWT_SECRET, TOKEN_HOURS
+from app.config import GOOGLE_CLIENT_ID, JWT_ALGORITHM, JWT_SECRET, TOKEN_HOURS
 
 BCRYPT_ROUNDS = 12  # cost factor: each +1 doubles the time to hash, and to guess
 MAX_PASSWORD_BYTES = 72  # bcrypt only reads the first 72 bytes of a password
@@ -87,17 +89,30 @@ def read_token(token: str) -> int:
     except (jwt.PyJWTError, ValueError) as error:
         raise InvalidToken(str(error)) from error
 
+
+class InvalidGoogleToken(Exception):
+    """The Google ID token is fake, expired, or made for another app."""
+
+
+class GoogleUnreachable(Exception):
+    """Google's public keys could not be downloaded: no internet, or Google is down."""
+
+
 def verify_google_token(token: str) -> dict:
+    """Check a "Sign in with Google" ID token and return what Google says about the person.
+
+    The answer includes "sub" (Google's fixed id for the person), "email",
+    "email_verified" and usually "name". The check downloads Google's public keys,
+    so it needs internet. It also checks that the token was made for our client ID.
+    """
     try:
-        # Verifies the signature and the audience (your client ID)
-        idinfo = id_token.verify_oauth2_token(
-            token, 
-            requests.Request(), 
-            GOOGLE_CLIENT_ID
+        return id_token.verify_oauth2_token(
+            token,
+            google_requests.Request(),
+            GOOGLE_CLIENT_ID,
+            clock_skew_in_seconds=int(CLOCK_LEEWAY.total_seconds()),
         )
-        return idinfo
-    except ValueError as error:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, 
-            detail="Invalid Google token"
-        ) from error
+    except google_exceptions.TransportError as error:
+        raise GoogleUnreachable(str(error)) from error
+    except (ValueError, google_exceptions.GoogleAuthError) as error:
+        raise InvalidGoogleToken(str(error)) from error
