@@ -347,7 +347,7 @@ tests, docs and demo practice.
 | [x] | 56 | Dev 4 | `docs: add recommender evaluation` | `backend/scripts/evaluate.py` (new) `docs/evaluation.md` (new) `backend/tests/test_evaluate.py` (new) | `python -m scripts.evaluate` prints Precision@10: hide some of each demo user's likes, then count how many come back in their top 10. Two numbers, before and after one weight change, and what changed |
 | [x] | 57 | everyone | `docs: complete decisions and glossary` | `docs/decisions.md` `docs/glossary.md` | At least 8 decisions, each with the rejected option. One of them is why OAuth ("log in with Google") was left out. Every term someone asked about |
 | [ ] | 58 | everyone | *(no commit — AI-use notes)* | — | Everyone's AI-use notes are complete: tool, version, prompt and what was kept |
-| [ ] | 59 | Dev 1 | `docs: final README with screenshots` | `README.md` `docs/screenshots/` | Status section removed. A teammate sets up on a clean laptop without asking a question |
+| [x] | 59 | Dev 1 | `docs: final README with screenshots` | `README.md` `docs/screenshots/` | Status section removed. A teammate sets up on a clean laptop without asking a question |
 | [ ] | 60 | Dev 1 | *(no commit — release)* | — | Pull request `dev` → `main`, merged. Then `git tag v1.0` and `git push origin v1.0` |
 
 ---

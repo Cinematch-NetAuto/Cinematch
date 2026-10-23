@@ -1,9 +1,9 @@
 # CineMatch
 
-A film recommendation web app. You create an account, pick the genres you like,
-search and browse films, like or dislike them and mark them watched. CineMatch then
-recommends films back to you, each with a written reason — *"Because you liked
-Inception"*.
+A web app that suggests films to watch. You make an account or sign in with Google.
+Then you pick the genres you like. You search for and look through films. You can
+mark films as liked, disliked, or watched. CineMatch then suggests films for you.
+Each film comes with a written reason, such as *"Because you liked Inception"*.
 
 A team project by four developers.
 Everything runs on your own computer. There is no hosted version.
@@ -13,6 +13,7 @@ Everything runs on your own computer. There is no hosted version.
 | Backend | Python 3.12 · FastAPI · PostgreSQL 16 (in Docker) |
 | Frontend | React 18 · Vite · plain JavaScript and CSS |
 | Movie data | [TMDB API](https://developer.themoviedb.org/) (free) |
+| Sign-in | Email and password · Google (optional) |
 | Automation | pytest · ruff · Jenkins pipeline |
 
 **New to the project?** Read this file, then [CONTRIBUTING.md](CONTRIBUTING.md),
@@ -20,47 +21,22 @@ then pick a task from [docs/build-plan.md](docs/build-plan.md).
 
 ---
 
-## Current status — 23 October 2026
+## Screenshots
 
-The **backend is complete**. It gets films from TMDB and supports search, filters,
-film pages, and saved data for fast loading. It also handles user accounts, Google
-sign-in, likes, dislikes, watch history, and preferences. It gives personal film
-picks and explains why each film was chosen. The **frontend works end to end** on
-every screen, including the preferences page. Only the language switch from phase 13
-is not built.
+**For you** — film picks made just for you. Each film shows why it was picked, such
+as "Because you liked Inception".
 
-| Part | State |
-|---|---|
-| Setup files (`.gitignore`, `.env.example`, `docker-compose.yml`, `requirements.txt`, `pyproject.toml`) | done |
-| Documentation (this file, `CONTRIBUTING.md`, `docs/build-plan.md`, `docs/decisions.md`, `docs/glossary.md`, `docs/evaluation.md`, `docs/manual-tests.md`) | done |
-| Database: the 8 tables (`db/schema.sql`), `scripts/init_db.py`, demo data (`scripts/seed_data.py`) | done |
-| Backend: movies — genres, title search, filters, film page, TMDB cache | done |
-| Backend: accounts — register, login, `GET /api/users/me` | done |
-| Google sign-in — `GET` / `POST /api/auth/google`, button on the Log in page | done — needs `GOOGLE_CLIENT_ID` in `.env` |
-| Backend: likes, dislikes, watch history | done |
-| Backend: preferences — `GET` / `PATCH /api/me/preferences` | done |
-| Backend: recommendations — 20 films, each with a score and a reason | done |
-| Offline demo: `scripts/warm_cache.py` fills the TMDB cache in advance | done |
-| Tests — unit tests and API tests on a separate test database | done — 109 tests pass |
-| Jenkins pipeline: install, lint, test and frontend build on every push | done — `docker compose up -d jenkins`, then http://localhost:8081 |
-| Frontend: home, sign-up, login, search, discover, film page, library, recommendations | done |
-| Frontend: phone layout, keyboard focus, reduced motion | done |
-| Frontend: preferences page | done |
-| Language switch | **not started** — phase 13 |
+![The For you page: film posters, each with a reason such as "Because you liked The Dark Knight"](docs/screenshots/for-you.jpg)
 
-What that means for the setup steps below:
+**Discover** — narrow down films by genre, release years, lowest rating, and country.
+You can also choose how to sort the list.
 
-| Step | Works today? |
-|---|---|
-| 1. Clone and configure | yes |
-| 2. Start the database | yes |
-| 3. Start the backend | **yes** — every endpoint so far is on `/docs`. `seed_data` adds 3 demo users: `ava@example.com`, `ben@example.com`, `cleo@example.com`, password `demo-password` |
-| 4. Start the frontend | **yes** — http://localhost:5173 |
-| Run the tests | **yes** — `pytest -q` in `backend/`; the API tests need the database from step 2 |
+![The Discover page with Science Fiction and the 1990s chosen](docs/screenshots/discover.jpg)
 
-The next job is **Phase 13** in [docs/build-plan.md](docs/build-plan.md). First comes the preferences
-page. Then comes the language switch.
-Update this section whenever a row changes. Delete it when every row says yes.
+**Film page** — shows the poster, background image, short summary, rating, and
+actors. On this page you can like or dislike a film and mark it as watched.
+
+![The film page for Inception](docs/screenshots/film-page.jpg)
 
 ---
 
@@ -68,16 +44,20 @@ Update this section whenever a row changes. Delete it when every row says yes.
 
 | # | Feature |
 |---|---|
-| 1 | Register and log in with email and password; stay logged in after a refresh |
+| 1 | Register and log in with email and password, or with Google; stay logged in after a refresh |
 | 2 | Search films by title |
 | 3 | Browse and filter by genre, year, popularity, rating and country |
 | 4 | Show 10 or 20 results per page |
 | 5 | Film detail page: poster, overview, rating, genres, cast |
 | 6 | Like or dislike a film; mark it watched; see your watch history |
-| 7 | Pick starter genres at sign-up; edit your preferences later |
+| 7 | Pick starter genres at sign-up; change them later on the Preferences page |
 | 8 | **Personal recommendations, each with a one-sentence reason** |
-| 9 | Switch content language (English and one other) |
+| 9 | Work offline for a demo, from saved copies of TMDB's answers |
 | 10 | Automatic lint, test and build on every push (Jenkins) |
+
+**Not built:** switching the content language (film titles and descriptions) between
+English and another language. This was step 52 in the build plan, and we left it out
+of this version.
 
 **Out of scope, on purpose:** TV shows, video playback, payments, comments or
 sharing, a mobile app, an admin panel, public hosting, e-mail, anything paid.
@@ -183,6 +163,12 @@ Open `.env` and fill in two values:
 Leave every other value as it is. `.env` is gitignored — **never commit it**, and
 never paste your token into the group chat. Each developer uses their own token.
 
+**Optional: Google sign-in.** In Google Cloud, make an OAuth client with the type
+"Web application". Set `http://localhost` and `http://localhost:5173` as its
+Authorized JavaScript origins. Copy its client ID into `.env` as `GOOGLE_CLIENT_ID`.
+If you skip this, the Log in page hides the Google button. Everything else still
+works the same.
+
 ### 2. Start the database
 
 ```bash
@@ -222,6 +208,23 @@ npm run dev
 - [ ] http://localhost:5173 shows the app
 - [ ] `pytest -q` in `backend/` passes
 
+### Before a demo without internet
+
+Stay connected to the internet. At most 6 hours before the demo, run this inside the
+`backend/` folder:
+
+```bash
+python -m scripts.warm_cache
+```
+
+This saves the list of genres and the first 5 pages of each Discover sort order. It
+also saves a search result for every saved film and every user's recommendations.
+When you have no internet, those screens load from the saved copies. Saved answers
+stay fresh for 6 hours (`CACHE_HOURS`). After that time, each page without internet
+waits about 9 seconds before it loads the saved copy. Film posters come from the TMDB
+image server, so without internet you see a placeholder instead. Google sign-in needs
+the internet, while email login works without it.
+
 ### If something goes wrong
 
 | Symptom | Fix |
@@ -232,6 +235,7 @@ npm run dev
 | TMDB answers `401` | `TMDB_API_TOKEN` is empty or wrong. Use the Read Access Token, not the API Key |
 | `pytest` says *"No module named 'app'"* | Run it from `backend/`, not from the repository root |
 | The first request (or each test run) waits about 20 seconds | `DATABASE_URL` says `localhost`. Use `127.0.0.1`: on some Windows PCs `localhost` tries IPv6 first |
+| Logging in fails with a 500 error after you pull new code | Your database is older than the code. Run `python -m scripts.init_db` in `backend/` once: it adds the new columns and keeps your data |
 
 ---
 
@@ -247,7 +251,7 @@ Cinematch/
 │   │   ├── models.py          one SQLAlchemy class per table
 │   │   ├── schemas.py         request and response shapes (Pydantic)
 │   │   ├── tmdb.py            the ONLY file that talks to TMDB
-│   │   ├── security.py        password hashing and login tokens
+│   │   ├── security.py        password hashing, login tokens, Google token check
 │   │   ├── deps.py            get_current_user() — "you must be logged in"
 │   │   ├── routers/           URLs: auth, movies, library, recommend
 │   │   └── services/          the real work: movies (search, cache, paging), recommend
@@ -260,10 +264,10 @@ Cinematch/
 │   └── src/
 │       ├── api/client.js      apiFetch() — every API call goes through it
 │       ├── context/           AuthContext — who is logged in
-│       ├── components/        MovieCard, MovieGrid, FilterPanel, Paginator, ...
+│       ├── components/        MovieCard, MovieGrid, FilterPanel, GoogleButton, ...
 │       ├── pages/             one file per screen (9 screens)
 │       └── styles/            tokens.css (all colours) and global.css
-├── docs/                      build plan, decisions, glossary, manual tests
+├── docs/                      build plan, decisions, glossary, tests, screenshots
 ├── docker-compose.yml         PostgreSQL, plus Jenkins on request
 ├── jenkins/Dockerfile         Jenkins with Python, for the pipeline
 ├── Jenkinsfile                the CI pipeline
@@ -283,7 +287,7 @@ without starting a server.
 
 ---
 
-## API (planned)
+## API
 
 Once the backend runs, the live list is at http://localhost:8000/docs.
 
@@ -291,6 +295,7 @@ Once the backend runs, the live list is at http://localhost:8000/docs.
 |---|---|---|
 | `GET /health` | no | `main.py` |
 | `POST /api/auth/register` · `POST /api/auth/login` | no | `routers/auth.py` |
+| `GET` / `POST /api/auth/google` (Google sign-in) | no | `routers/auth.py` |
 | `GET /api/users/me` | yes | `routers/auth.py` |
 | `GET /api/genres` | no | `routers/movies.py` |
 | `GET /api/movies/search?q=&page=&per_page=` | no | `routers/movies.py` |
@@ -328,6 +333,8 @@ request into `dev`, get one teammate to review it, never push to `main`.
 | [docs/decisions.md](docs/decisions.md) | Each design decision and the option we rejected |
 | [docs/glossary.md](docs/glossary.md) | Every project term, in plain words |
 | [docs/manual-tests.md](docs/manual-tests.md) | Click-through test steps |
+| [docs/evaluation.md](docs/evaluation.md) | How well the recommender finds films a user liked |
+| [docs/design.md](docs/design.md) | The look: colours, type and layout |
 
 ## Attribution and licence
 
