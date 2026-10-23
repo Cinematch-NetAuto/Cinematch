@@ -309,7 +309,7 @@ each on their own branch. **After this phase `pytest -q` passes**, so the
 
 | ✓ | # | Commit message | Files | Done when |
 |---|---|---|---|---|
-| [ ] | 51 | `feat: add preferences endpoints and page` | `backend/app/routers/library.py` `backend/app/schemas.py` `backend/tests/test_api_library.py` `frontend/src/pages/Preferences.jsx` | `GET` and `PATCH /api/me/preferences`, with tests: a change is saved, a bad value gives 422, no token gives 401. Raise the minimum rating → recommendations change |
+| [x] | 51 | `feat: add preferences endpoints and page` | `backend/app/routers/library.py` `backend/app/schemas.py` `backend/tests/test_api_library.py` `frontend/src/pages/Preferences.jsx` | `GET` and `PATCH /api/me/preferences`, with tests: a change is saved, a bad value gives 422, no token gives 401. Raise the minimum rating → recommendations change |
 | [ ] | 52 | `feat: switch content language` | `frontend/src/api/client.js` `backend/app/tmdb.py` `backend/app/services/movies.py`, the routers that pass the language on, and a test | Switch language → film titles and overviews change. A test shows that two languages get two cache entries. **`tmdb.py` is Dev 2's file — agree the change with them** |
 
 > **Traps**

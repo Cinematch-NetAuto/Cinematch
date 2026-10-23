@@ -20,14 +20,14 @@ then pick a task from [docs/build-plan.md](docs/build-plan.md).
 
 ---
 
-## Current status — 21 October 2026
+## Current status — 23 October 2026
 
-The **backend is complete**. It gets films from TMDB with search, filters, film
-pages, and a cache. It also handles accounts, likes, dislikes, watch history, and
-preferences. It gives personal recommendations with reasons. The **frontend works
-end to end** for every screen except the preferences page. That page is just a
-placeholder for now. The preferences page and the language switch will come in
-phase 13.
+The **backend is complete**. It gets films from TMDB and supports search, filters,
+film pages, and saved data for fast loading. It also handles user accounts, Google
+sign-in, likes, dislikes, watch history, and preferences. It gives personal film
+picks and explains why each film was chosen. The **frontend works end to end** on
+every screen, including the preferences page. Only the language switch from phase 13
+is not built.
 
 | Part | State |
 |---|---|
@@ -45,7 +45,7 @@ phase 13.
 | Jenkins pipeline: install, lint, test and frontend build on every push | done — `docker compose up -d jenkins`, then http://localhost:8081 |
 | Frontend: home, sign-up, login, search, discover, film page, library, recommendations | done |
 | Frontend: phone layout, keyboard focus, reduced motion | done |
-| Frontend: preferences page | **not started** — phase 13 |
+| Frontend: preferences page | done |
 | Language switch | **not started** — phase 13 |
 
 What that means for the setup steps below:
