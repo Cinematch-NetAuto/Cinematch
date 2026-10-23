@@ -1,6 +1,9 @@
 // Sign up, at /register. You pick at least 3 genres here, so the recommender
 // has something to work with from day one (the "cold start"). After signing up
 // you are logged in and go to Home.
+//
+// Coming from "Sign in with Google" (location.state.googleCredential), the page
+// only asks for the genres: Google already gave the name and the email.
 import { useCallback, useEffect, useState } from 'react'
 import { Link, Navigate, useLocation } from 'react-router-dom'
 import { apiFetch } from '../api/client.js'

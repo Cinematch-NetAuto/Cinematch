@@ -13,7 +13,7 @@ from sqlalchemy.exc import IntegrityError
 from app.config import GOOGLE_CLIENT_ID
 from app.deps import CurrentUser, Db
 from app.models import User, UserPreferences
-from app.schemas import GoogleLogin, LoginRequest, TokenResponse, UserCreate, UserOut
+from app.schemas import GoogleConfig, GoogleLogin, LoginRequest, TokenResponse, UserCreate, UserOut
 from app.security import (
     GoogleUnreachable,
     InvalidGoogleToken,
@@ -89,6 +89,12 @@ def me(user: CurrentUser):
     return user
 
 
+@router.get("/auth/google", response_model=GoogleConfig)
+def google_config():
+    """The client ID for the "Sign in with Google" button. Empty: Google sign-in is off."""
+    return GoogleConfig(client_id=GOOGLE_CLIENT_ID)
+
+
 @router.post("/auth/google", response_model=TokenResponse)
 def google_sso(body: GoogleLogin, db: Db):
     """Log in or sign up with Google, and answer with our own login token.
@@ -97,8 +103,8 @@ def google_sso(body: GoogleLogin, db: Db):
     - The email already has an email-and-password account: link Google to it, but
       only when Google says the email is verified and no other Google account is
       linked. Otherwise anyone could take that account over.
-    - Otherwise: a new account with no password. Starter genres are optional; when
-      they are sent, they are checked as at sign-up.
+    - Otherwise: a new account with no password. Like sign-up, it needs 3 or more
+      starter genres; without them the answer is 428, so the page can ask for them.
     """
     if not GOOGLE_CLIENT_ID:
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Google sign-in is not set up")
@@ -125,18 +131,19 @@ def google_sso(body: GoogleLogin, db: Db):
     if user is not None:
         return TokenResponse(access_token=create_token(user.id))
 
-    # --- New user ---
-    genre_ids = body.genre_ids or []
-    if genre_ids:  # checked against TMDB's list, exactly like sign-up
-        try:
-            known = {genre.id for genre in movie_service.list_genres(db)}
-        except TmdbError as error:
-            raise HTTPException(status.HTTP_502_BAD_GATEWAY, "Genre list unavailable") from error
-        unknown = sorted(set(genre_ids) - known)
-        if unknown:
-            raise HTTPException(
-                status.HTTP_422_UNPROCESSABLE_ENTITY, f"Unknown genre ids: {unknown}"
-            )
+    # --- New user: like sign-up, starter genres are needed and checked ---
+    genre_ids = body.genre_ids
+    if not genre_ids:  # the page then asks for genres and sends the same token again
+        raise HTTPException(
+            status.HTTP_428_PRECONDITION_REQUIRED, "Pick at least 3 genres to finish signing up"
+        )
+    try:
+        known = {genre.id for genre in movie_service.list_genres(db)}
+    except TmdbError as error:
+        raise HTTPException(status.HTTP_502_BAD_GATEWAY, "Genre list unavailable") from error
+    unknown = sorted(set(genre_ids) - known)
+    if unknown:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, f"Unknown genre ids: {unknown}")
 
     display_name = (idinfo.get("name") or email.split("@")[0])[:50]  # sign-up allows 50
     new_user = User(email=email, display_name=display_name, google_id=google_id)

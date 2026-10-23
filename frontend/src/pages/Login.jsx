@@ -2,7 +2,7 @@
 // here (location.state.from), or to Home. A logged-in visitor goes straight on.
 import { useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { GoogleLogin } from '@react-oauth/google'
+import GoogleButton from '../components/GoogleButton.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 
 export default function Login() {
@@ -34,20 +34,16 @@ export default function Login() {
     }
   }
 
-  async function handleGoogleSuccess(credentialResponse) {
+  // After "Sign in with Google". A new Google user first picks 3 genres on the
+  // sign-up page (the backend answers 428 until they do), like a normal sign-up.
+  async function handleGoogle(credential) {
     setBusy(true)
     setError('')
     try {
-      await googleLogin(credentialResponse.credential)
+      await googleLogin(credential) // on success `user` is set and we move on
     } catch (failure) {
-      if (failure.status === 442) {
-        // New user detected! Send them to register to pick 3 genres
-        navigate('/register', { 
-          state: { 
-            ...location.state, 
-            googleCredential: credentialResponse.credential 
-          } 
-        })
+      if (failure.status === 428) {
+        navigate('/register', { state: { ...location.state, googleCredential: credential } })
       } else {
         setError(failure.message)
         setBusy(false)
@@ -86,15 +82,10 @@ export default function Login() {
           {busy ? 'Logging in…' : 'Log in'}
         </button>
       </form>
-
-      <p style={{ textAlign: 'center', marginBottom: '1rem' }}>— or log in with email —</p>
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>
-        <GoogleLogin
-          onSuccess={handleGoogleSuccess}
-          onError={() => setError('Google Sign-In failed. Please try again.')}
-        />
-      </div>
-      
+      <GoogleButton
+        onCredential={handleGoogle}
+        onError={() => setError('Google sign-in failed. Try again.')}
+      />
       <p>
         No account yet?{' '}
         <Link to="/register" state={location.state}>
