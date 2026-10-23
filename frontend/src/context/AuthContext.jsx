@@ -57,14 +57,29 @@ export function AuthProvider({ children }) {
     [login],
   )
 
+  const googleLogin = useCallback(async (credential, genreIds = null) => {
+    const body = { credential }
+    if (genreIds) body.genre_ids = genreIds
+
+    const { access_token } = await apiFetch('/auth/google', {
+      method: 'POST',
+      body,
+      auth: false,
+    })
+    setToken(access_token)
+    const me = await apiFetch('/users/me')
+    setUser(me)
+    return me
+  }, [])
+
   const logout = useCallback(() => {
     clearToken()
     setUser(null)
   }, [])
 
   const value = useMemo(
-    () => ({ user, checking, login, register, logout }),
-    [user, checking, login, register, logout],
+    () => ({ user, checking, login, register, googleLogin, logout }),
+    [user, checking, login, register, googleLogin, logout],
   )
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

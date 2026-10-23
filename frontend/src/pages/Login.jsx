@@ -1,12 +1,14 @@
 // Log in, at /login. After logging in you go back to the page that sent you
 // here (location.state.from), or to Home. A logged-in visitor goes straight on.
 import { useState } from 'react'
-import { Link, Navigate, useLocation } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
+import GoogleButton from '../components/GoogleButton.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 
 export default function Login() {
-  const { user, login } = useAuth()
+  const { user, login, googleLogin } = useAuth()
   const location = useLocation()
+  const navigate = useNavigate()
   const goTo = location.state?.from || '/'
 
   const [email, setEmail] = useState('')
@@ -29,6 +31,23 @@ export default function Login() {
     } catch (failure) {
       setError(failure.message) // for example "Invalid email or password"
       setBusy(false)
+    }
+  }
+
+  // After "Sign in with Google". A new Google user first picks 3 genres on the
+  // sign-up page (the backend answers 428 until they do), like a normal sign-up.
+  async function handleGoogle(credential) {
+    setBusy(true)
+    setError('')
+    try {
+      await googleLogin(credential) // on success `user` is set and we move on
+    } catch (failure) {
+      if (failure.status === 428) {
+        navigate('/register', { state: { ...location.state, googleCredential: credential } })
+      } else {
+        setError(failure.message)
+        setBusy(false)
+      }
     }
   }
 
@@ -63,6 +82,10 @@ export default function Login() {
           {busy ? 'Logging in…' : 'Log in'}
         </button>
       </form>
+      <GoogleButton
+        onCredential={handleGoogle}
+        onError={() => setError('Google sign-in failed. Try again.')}
+      />
       <p>
         No account yet?{' '}
         <Link to="/register" state={location.state}>

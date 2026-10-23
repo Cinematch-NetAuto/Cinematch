@@ -12,6 +12,8 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true, // fail loudly instead of moving to another port
+    // Google's advice for testing "Sign in with Google" on http://localhost
+    headers: { 'Referrer-Policy': 'no-referrer-when-downgrade' },
     proxy: {
       '/api': 'http://127.0.0.1:8000',
     },

@@ -197,13 +197,13 @@ class Recommendation(MovieCard):
 class GoogleLogin(BaseModel):
     """Google sign-in: the ID token that the "Sign in with Google" button gave the browser.
 
-    genre_ids is optional. When it is sent, it needs 3 or more different genres, as at
-    sign-up, and a new account starts from them; otherwise it starts with none.
+    A returning user sends only the credential. A new account also needs genre_ids
+    (3 or more different genres, as at sign-up); without them the answer is 428.
     """
 
     credential: str = Field(min_length=1)
     genre_ids: list[int] | None = Field(
-        default=None, description="Optional: at least 3 different genre ids for a new account"
+        default=None, description="Needed for a new account: at least 3 different genre ids"
     )
 
     @field_validator("genre_ids")
@@ -211,3 +211,9 @@ class GoogleLogin(BaseModel):
     def three_or_none(cls, genre_ids: list[int] | None) -> list[int] | None:
         """None means "not sent"; a list that is sent needs 3 or more different genres."""
         return None if genre_ids is None else _three_genres(genre_ids)
+
+
+class GoogleConfig(BaseModel):
+    """What the frontend needs to show the Google button. An empty client_id hides it."""
+
+    client_id: str

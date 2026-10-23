@@ -135,6 +135,6 @@ so write it in your own words, the day you decide.
 ### D17 — Add "Sign in with Google" next to email and password
 
 - **Date / who:** 2026-10-23 · team
-- **Chose:** Google sign-in as an extra way in, checked on the backend with Google's `google-auth` library; email and password stay
+- **Chose:** Google sign-in as an extra way in, checked on the backend with Google's `google-auth` library; email and password stay; a new Google account picks 3 starter genres, as at sign-up
 - **Rejected:** Google as the only login, and keeping email and password only (D2)
 - **Why:** The browser flow needs only the public client ID, not a secret, and sign-in is off when `GOOGLE_CLIENT_ID` is empty. Google sign-in needs internet, so the offline demo keeps using email and password.

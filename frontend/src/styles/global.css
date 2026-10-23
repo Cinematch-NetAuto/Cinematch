@@ -719,6 +719,19 @@ img {
   color: var(--programme);
 }
 
+.form-or {
+  margin: 0 0 var(--s3);
+  text-align: center;
+  font-size: var(--fs-caption);
+  color: var(--programme);
+}
+
+.google-button {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--s5);
+}
+
 .field input {
   padding: var(--s2) var(--s3);
   border: 1px solid var(--hairline);
