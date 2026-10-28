@@ -26,3 +26,7 @@ pytest==8.3.4             # the test runner
 pytest-cov==6.0.0         # coverage report (pytest --cov=app)
 httpx==0.28.1             # lets tests call our API without a live server
 ruff==0.8.4               # linter, keeps four people's style identical
+
+# --- UI Automated Testing ---------------------------------------------------
+selenium
+webdriver-manager
