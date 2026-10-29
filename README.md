@@ -133,53 +133,69 @@ asking for at least 3 genres at sign-up.
 
 ## Setup
 
-### What you need installed
+Do these steps in order. Each step shows what appears on your screen when it works.
+
+### 0. Install these first
 
 | Tool | Version | Check with |
 |---|---|---|
-| Python | 3.12 or newer | `python --version` |
-| Node.js | 20 or newer | `node --version` |
+| Python | 3.12 or 3.13 | `python --version` |
+| Node.js | 22 or newer (20.19 also works) | `node --version` |
 | Docker Desktop | any recent | `docker compose version` |
 | Git | any recent | `git --version` |
 | A free TMDB account | — | [themoviedb.org/signup](https://www.themoviedb.org/signup) |
 
-### 1. Get the code and make your settings file
+Newer Python versions might fail to install the project's Python packages. Use Python
+3.12 or 3.13 instead.
+
+Open **Docker Desktop**. Wait until it says the engine is running. Every `docker`
+command below needs this app open.
+
+### 1. Get the code
 
 ```bash
 git clone https://github.com/Cinematch-NetAuto/Cinematch.git
 cd Cinematch
+```
+
+You can also download the project with GitHub Desktop. Then open a command window
+inside the `Cinematch` folder. Run every command below from this folder.
+
+### 2. Make your settings file
+
+```bash
 cp .env.example .env
 ```
 
-(`cp` works in PowerShell, Git Bash, macOS and Linux. In `cmd.exe` use `copy`.)
+(`cp` works in PowerShell, Git Bash, macOS, and Linux. Use `copy` in `cmd.exe`.)
 
-Open `.env` and fill in two values:
+Open `.env` in a text program. Fill in two values:
 
 | Setting | Where to get it |
 |---|---|
 | `TMDB_API_TOKEN` | TMDB → Settings → API → **API Read Access Token** (the long one, not the short "API Key") |
 | `JWT_SECRET` | Run `python -c "import secrets; print(secrets.token_urlsafe(48))"` and paste the output |
 
-Leave every other value as it is. `.env` is gitignored — **never commit it**, and
-never paste your token into the group chat. Each developer uses their own token.
+Do not change any other value. Git ignores `.env`, so this file stays only on your
+computer. Never share your TMDB token. Every person uses their own.
 
-**Optional: Google sign-in.** In Google Cloud, make an OAuth client with the type
-"Web application". Set `http://localhost` and `http://localhost:5173` as its
-Authorized JavaScript origins. Copy its client ID into `.env` as `GOOGLE_CLIENT_ID`.
-If you skip this, the Log in page hides the Google button. Everything else still
+**Optional: Google sign-in.** Open Google Cloud and create an OAuth client. Choose
+the type "Web application". Add `http://localhost` and `http://localhost:5173` under
+Authorized JavaScript origins. Copy the client ID into `.env` as `GOOGLE_CLIENT_ID`.
+If you skip this, the Log in page hides the Google button. The rest of the app still
 works the same.
 
-### 2. Start the database
+### 3. Start the database
 
 ```bash
 docker compose up -d db
 docker compose ps
 ```
 
-Wait until the `cinematch-db` row says **healthy**. Your data survives
-`docker compose down`.
+Run `docker compose ps` again until the `cinematch-db` row says **healthy**. Your
+saved data stays safe when you run `docker compose down`.
 
-### 3. Start the backend
+### 4. Start the backend
 
 ```bash
 cd backend
@@ -188,12 +204,18 @@ python -m venv .venv
 # .venv\Scripts\activate.bat      # Windows cmd
 # source .venv/bin/activate       # macOS / Linux
 pip install -r requirements.txt
-python -m scripts.init_db         # creates the tables
-python -m scripts.seed_data       # adds genres and demo users
+python -m scripts.init_db
+python -m scripts.seed_data
 uvicorn app.main:app --reload
 ```
 
-### 4. Start the frontend (a second terminal)
+`init_db` shows `Database ready: 8 tables` on the screen. `seed_data` adds demo films
+and three demo users. Uvicorn shows `Uvicorn running on http://127.0.0.1:8000`. Leave
+this command window open.
+
+### 5. Start the frontend
+
+Open a **second** command window in the `Cinematch` folder:
 
 ```bash
 cd frontend
@@ -201,34 +223,75 @@ npm install
 npm run dev
 ```
 
+Vite shows `Local: http://localhost:5173/` on the screen. Leave this command window
+open too.
+
+### 6. Log in
+
+Open http://localhost:5173 in your web browser. Log in with a demo account, or sign
+up with your own email.
+
+| Email | Password |
+|---|---|
+| `ava@example.com` | `demo-password` |
+| `ben@example.com` | `demo-password` |
+| `cleo@example.com` | `demo-password` |
+
 ### You are set up when all four are true
 
-- [ ] http://localhost:8000/health shows `{"status": "ok"}`
-- [ ] http://localhost:8000/docs shows the interactive API page
-- [ ] http://localhost:5173 shows the app
-- [ ] `pytest -q` in `backend/` passes
+- [ ] http://localhost:8000/health shows `{"status": "ok"}` on the page
+- [ ] http://localhost:8000/docs shows the clickable API page
+- [ ] http://localhost:5173 shows the app on the page
+- [ ] In `backend/`, activate the virtual environment (`.venv\Scripts\Activate.ps1`
+      on Windows), then run `pytest -q`. All tests must pass.
+
+### Next time you start the app
+
+1. Open Docker Desktop.
+2. Go to the `Cinematch` folder and run `docker compose up -d db`.
+3. Go to `backend/` and activate the virtual environment
+   (`.venv\Scripts\Activate.ps1` on Windows). Then run
+   `uvicorn app.main:app --reload`.
+4. Open a second command window, go to `frontend/`, and run `npm run dev`.
+
+### After you pull new code
+
+Go to `backend/` and activate the virtual environment (`.venv\Scripts\Activate.ps1`
+on Windows). Run `pip install -r requirements.txt` and `python -m scripts.init_db`.
+Next, go to `frontend/` and run `npm install`. These commands add new software parts
+and new database columns. Your saved data stays safe.
 
 ### Before a demo without internet
 
-Stay connected to the internet. At most 6 hours before the demo, run this inside the
-`backend/` folder:
+Stay on the internet. Up to 6 hours before the demo, go to the `backend/` folder and
+run this:
 
 ```bash
 python -m scripts.warm_cache
 ```
 
-This saves the list of genres and the first 5 pages of each Discover sort order. It
-also saves a search result for every saved film and every user's recommendations.
-When you have no internet, those screens load from the saved copies. Saved answers
-stay fresh for 6 hours (`CACHE_HOURS`). After that time, each page without internet
-waits about 9 seconds before it loads the saved copy. Film posters come from the TMDB
-image server, so without internet you see a placeholder instead. Google sign-in needs
-the internet, while email login works without it.
+This saves the genre list and the first 5 pages for each way you can sort the
+Discover page. It also saves a search result for each saved film and each user's
+recommendations. When you are offline, those screens load from the saved copies.
+Saved copies stay fresh for 6 hours (`CACHE_HOURS`). After that time, each offline
+page waits about 9 seconds before it loads the saved copy. Film posters come from the
+TMDB picture service, so you see a placeholder when you have no internet. Signing in
+with Google needs the internet, but signing in with email works offline.
+
+### Optional: Jenkins
+
+Jenkins runs the checks every time changes are sent in. Run
+`docker compose up -d jenkins` to start it. Then open http://localhost:8081. Step 12 in
+[docs/build-plan.md](docs/build-plan.md) shows how to set up the task.
 
 ### If something goes wrong
 
 | Symptom | Fix |
 |---|---|
+| `docker` says it cannot connect, or *"The system cannot find the file specified"* | Docker Desktop is not running. Start it, wait until the engine is running, then try again |
+| `python` is not found on Windows | Use `py` instead of `python`, for example `py -m venv .venv` |
+| `pip install` fails while building a package | Your Python is too new. Install Python 3.12 or 3.13 and make the virtual environment again |
+| `npm run dev` says your Node.js version is not supported | Install Node.js 22 or newer |
 | PowerShell: *"running scripts is disabled on this system"* | Run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once, or use `cmd` and `activate.bat` |
 | `docker compose up` fails: port 5432 is in use | Another PostgreSQL is running. Stop it, or change the port to `"5433:5432"` in `docker-compose.yml` **and** in `DATABASE_URL` |
 | `cinematch-db` never becomes healthy | Run `docker compose logs db` and read the last lines |

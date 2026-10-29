@@ -1,0 +1,7 @@
+# Packages for the end-to-end test (tests/test_e2e.py) only. Install them into
+# the backend's virtual environment, from the repository root:
+#     pip install -r tests/requirements-e2e.txt
+# Pinned on purpose, like backend/requirements.txt. Jenkins does not install them.
+
+selenium==4.51.0          # drives a real Chrome window
+webdriver-manager==4.1.2  # downloads the ChromeDriver that matches your Chrome
