@@ -22,6 +22,8 @@ coverage.xml
 htmlcov/
 # Produced by the pipeline: pytest --cov=app --junitxml=junit.xml
 junit.xml
+# Saved by tests/test_e2e.py when a check fails
+test_failure.png
 *.log
 
 # --- Node ------------------------------------------------------------------
