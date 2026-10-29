@@ -1,3 +1,19 @@
+"""End-to-end test: drives the real app in Chrome, from sign-up to logging back in.
+
+Not part of the Jenkins pipeline: it needs a desktop with Google Chrome and the
+whole app running. Each run signs up one new user (testuser_...@example.com),
+and nothing deletes these users afterwards.
+
+How to run, from the repository root:
+    1. Start the database, the backend and the frontend (README, Setup section).
+    2. Activate the backend's virtual environment and install the test packages once:
+           pip install -r tests/requirements-e2e.txt
+    3. python tests/test_e2e.py      (or, in frontend/:  npm run test:e2e)
+
+The script exits with code 0 when all 8 checks pass, and 1 when one fails.
+"""
+
+import sys
 import time
 import uuid
 from selenium import webdriver
@@ -126,7 +142,9 @@ def run_e2e_tests():
         driver.find_element(By.CSS_SELECTOR, "input[type='password']").send_keys(test_password)
         driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
 
-        wait.until(EC.url_to_be("http://localhost:5173/"))
+        # Test 6 was sent to /login from /me/recommendations, and the login page
+        # returns you there (location.state.from survives the refresh above).
+        wait.until(EC.url_to_be("http://localhost:5173/me/recommendations"))
         print("✅ Passed: Returning user authenticated.")
         passed_tests += 1
 
@@ -160,5 +178,7 @@ def run_e2e_tests():
         else:
             print("\nAll tests passed successfully!")
 
+    return failure_reason is None
+
 if __name__ == "__main__":
-    run_e2e_tests()
+    sys.exit(0 if run_e2e_tests() else 1)
